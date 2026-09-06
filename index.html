@@ -120,35 +120,25 @@
             display: block;
         }
 
-        /* 宽屏：保持现在的宽幅视觉效果 */
-        /* 窄屏规则见下方：改为 contain，完整显示照片 */
-        .slide::before {
+        /* 底部渐隐层 - 修复位置 */
+        .slide::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
             height: 40%;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
             z-index: 1;
             pointer-events: none;
         }
 
-        @media (max-aspect-ratio: 1.4/1) {
-            .slide::before {
-                top: var(--photo-height, 60vh);
-                bottom: auto;
-                height: 22%;
-                background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            }
-        }
-
-        /* 所有首页图片的信息固定在同一个位置 */
+        /* 配文 - 固定在底部 */
         .slide-caption {
             position: absolute;
+            bottom: 55px;
             left: 0;
             right: 0;
-            bottom: 55px;
             z-index: 2;
             padding: 0 40px;
             text-align: center;
@@ -179,21 +169,15 @@
             line-height: 1.5;
         }
 
-        /* --- 4. 窄屏时：完整显示图片，不裁掉左右内容 --- */
+        /* --- 4. 窄屏适配：完整显示图片，配文跟随图片底部 --- */
         @media (max-aspect-ratio: 1.4/1) {
-            /*
-             * 窄屏：
-             * 图片不裁剪，并且始终从幻灯片区域最顶部开始。
-             * 图片高度根据自身比例自动计算。
-             */
             .slide {
                 display: block;
+                align-items: unset;
             }
 
             .slide img {
-                position: absolute;
-                top: 0;
-                left: 0;
+                position: relative;
                 width: 100%;
                 height: auto;
                 max-height: none;
@@ -201,20 +185,31 @@
                 object-position: top center;
             }
 
-            /*
-             * 信息跟随图片底部。
-             * 使用图片宽度对应的比例计算位置，而不是固定 top。
-             * 对当前摄影作品的常见画幅，信息会稳定地位于照片下方。
-             */
-            .slide-caption {
-                top: min(100vw, 85vh);
-                bottom: auto;
+            /* 窄屏时，渐隐层位于图片底部 */
+            .slide::after {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 30%;
+                background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+                z-index: 1;
+                pointer-events: none;
             }
 
-            .slide::before {
-                top: min(100vw, 85vh);
-                bottom: auto;
-                height: 22%;
+            .slide-caption {
+                position: absolute;
+                bottom: 30px;
+                left: 0;
+                right: 0;
+                z-index: 2;
+                padding: 0 25px;
+                text-align: center;
+            }
+
+            /* 窄屏时，配文位置跟随图片底部 */
+            .slide-caption {
+                bottom: 30px;
             }
         }
 
@@ -263,7 +258,6 @@
             filter: brightness(1.1);
         }
 
-        /* 小图悬停信息 */
         .overlay {
             position: absolute;
             bottom: 0;
@@ -421,7 +415,6 @@
             color: #888;
         }
 
-        /* 邮件地址刻意不是超链接 */
         .about-email {
             user-select: text;
         }
@@ -479,7 +472,7 @@
             }
 
             .slide-caption {
-                bottom: 35px;
+                bottom: 25px;
                 padding: 0 25px;
             }
 
@@ -802,41 +795,6 @@
         setInterval(nextSlide, INTERVAL_TIME);
 
 
-        /*
-         * 窄屏幻灯片：
-         * 每张照片保持原比例、从顶部开始，并让标题/地点跟随实际照片底部。
-         */
-        function updateNarrowSlideLayout() {
-            if (window.innerWidth / window.innerHeight > 1.4) return;
-
-            slides.forEach((slide) => {
-                const img = slide.querySelector('img');
-                const caption = slide.querySelector('.slide-caption');
-
-                if (!img || !caption) return;
-
-                const applyPosition = () => {
-                    if (!img.naturalWidth || !img.naturalHeight) return;
-
-                    const renderedHeight = img.naturalHeight / img.naturalWidth * window.innerWidth;
-
-                    caption.style.top = renderedHeight + 'px';
-                    caption.style.bottom = 'auto';
-
-                    slide.style.setProperty('--photo-height', renderedHeight + 'px');
-                };
-
-                if (img.complete) {
-                    applyPosition();
-                } else {
-                    img.addEventListener('load', applyPosition, { once: true });
-                }
-            });
-        }
-
-        window.addEventListener('resize', updateNarrowSlideLayout);
-        window.addEventListener('load', updateNarrowSlideLayout);
-
         /* --- 2. 导航栏滚动渐变逻辑 --- */
         const nav = document.querySelector('nav');
         const heroSection = document.querySelector('.hero-slideshow');
@@ -926,7 +884,6 @@
         const aboutOverlay = document.getElementById('about-overlay');
         const aboutBack = document.getElementById('about-back');
 
-        /* 保存打开 ABOUT 前的滚动位置 */
         let savedScrollPosition = 0;
 
         function openAbout(e) {
@@ -944,7 +901,6 @@
             aboutOverlay.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('about-open');
 
-            /* 精确返回之前浏览到的位置 */
             window.scrollTo(0, savedScrollPosition);
         }
 
