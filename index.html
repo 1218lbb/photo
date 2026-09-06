@@ -120,7 +120,7 @@
             display: block;
         }
 
-        /* 底部渐隐层 - 修复位置 */
+        /* 底部渐隐层 */
         .slide::after {
             content: '';
             position: absolute;
@@ -133,7 +133,6 @@
             pointer-events: none;
         }
 
-        /* 配文 - 固定在底部 */
         .slide-caption {
             position: absolute;
             bottom: 55px;
@@ -169,7 +168,7 @@
             line-height: 1.5;
         }
 
-        /* --- 4. 窄屏适配：完整显示图片，配文跟随图片底部 --- */
+        /* --- 4. 窄屏适配 --- */
         @media (max-aspect-ratio: 1.4/1) {
             .slide {
                 display: block;
@@ -185,7 +184,6 @@
                 object-position: top center;
             }
 
-            /* 窄屏时，渐隐层位于图片底部 */
             .slide::after {
                 position: absolute;
                 bottom: 0;
@@ -207,7 +205,6 @@
                 text-align: center;
             }
 
-            /* 窄屏时，配文位置跟随图片底部 */
             .slide-caption {
                 bottom: 30px;
             }
@@ -324,16 +321,26 @@
             object-fit: contain;
         }
 
-        .close-btn {
+        /* 返回箭头 - 样式与 ABOUT 的 BACK 一致 */
+        .lightbox-back {
             position: absolute;
             top: 30px;
-            right: 40px;
+            left: 40px;
+            background: none;
+            border: none;
             color: #fff;
-            font-size: 30px;
-            cursor: pointer;
-            font-weight: 200;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 300;
             letter-spacing: 2px;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: opacity 0.3s ease;
             z-index: 1002;
+        }
+
+        .lightbox-back:hover {
+            opacity: 0.55;
         }
 
         .lightbox-prev,
@@ -506,10 +513,10 @@
                 right: 5px;
             }
 
-            .close-btn {
+            .lightbox-back {
                 top: 20px;
-                right: 20px;
-                font-size: 22px;
+                left: 20px;
+                font-size: 11px;
             }
 
             .about-content {
@@ -728,6 +735,9 @@
     <!-- 图片放大预览框 -->
     <div id="lightbox" class="lightbox">
 
+        <!-- 返回箭头 (与 ABOUT 的 BACK 样式一致) -->
+        <button class="lightbox-back" onclick="closeLightbox()">← BACK</button>
+
         <button class="lightbox-prev" onclick="event.stopPropagation(); previousImage()" aria-label="上一张">
             ‹
         </button>
@@ -737,8 +747,6 @@
         <button class="lightbox-next" onclick="event.stopPropagation(); nextImage()" aria-label="下一张">
             ›
         </button>
-
-        <span class="close-btn" onclick="closeLightbox()">CLOSE</span>
 
     </div>
 
@@ -856,11 +864,12 @@
             document.body.style.overflow = 'auto';
         }
 
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
+        // 点击黑色背景不再关闭
+        // lightbox.addEventListener('click', (e) => {
+        //     if (e.target === lightbox) {
+        //         closeLightbox();
+        //     }
+        // });
 
         document.addEventListener('keydown', (e) => {
             if (!lightbox.classList.contains('active')) return;
