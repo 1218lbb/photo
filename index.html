@@ -15,40 +15,35 @@
         a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
         a:hover { opacity: 0.7; }
 
-        /* --- 2. 顶部信息栏 --- */
-   /* --- 2. 顶部信息栏 (透明且叠加在图片上) --- */
-/* --- 2. 顶部信息栏 (固定悬浮，不随页面滚动) --- */
-nav {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    padding: 25px 50px;
-    background-color: transparent; /* 保持透明 */
-    position: fixed; /* 核心改动：改为固定定位，永远悬浮在视口顶部 */
-    top: 0; 
-    left: 0; 
-    right: 0; /* 铺满屏幕顶部宽度 */
-    z-index: 100; /* 确保始终在最上层 */
-}
-
-/* 以下样式完全保留你之前的要求 */
-.logo { 
-    font-size: 20px; /* 保留原本大小 */
-    font-weight: 600; 
-    letter-spacing: 4px; 
-    color: #fff; /* 强制白色 */
-    text-transform: uppercase;
-}
-.nav-links a { 
-    margin-left: 40px; 
-    font-size: 13px; /* 保留原本大小 */
-    text-transform: uppercase; 
-    letter-spacing: 2px; 
-    color: #fff; /* 强制白色 */
-    transition: opacity 0.3s ease;
-}
-.nav-links a:hover { color: #fff; opacity: 0.7; }
-        
+        /* --- 2. 顶部信息栏 (固定悬浮，不随页面滚动) --- */
+        nav {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 25px 50px;
+            background-color: transparent; /* 保持透明 */
+            position: fixed; /* 核心：固定定位，永远悬浮在视口顶部 */
+            top: 0; 
+            left: 0; 
+            right: 0; /* 铺满屏幕顶部宽度 */
+            z-index: 100; /* 确保始终在最上层 */
+        }
+        .logo { 
+            font-size: 20px; /* 保留原本大小 */
+            font-weight: 600; 
+            letter-spacing: 4px; 
+            color: #fff; /* 强制白色 */
+            text-transform: uppercase;
+        }
+        .nav-links a { 
+            margin-left: 40px; 
+            font-size: 13px; /* 保留原本大小 */
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #fff; /* 强制白色，确保在图片上清晰可见 */
+            transition: opacity 0.3s ease;
+        }
+        .nav-links a:hover { color: #fff; opacity: 0.7; }
 
         /* --- 3. 全屏幻灯片 (Slideshow) --- */
         .hero-slideshow {
@@ -56,23 +51,23 @@ nav {
         }
         .slide {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; /* 默认隐藏 */
+            opacity: 0;
             transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1); /* 核心：加减速平滑过渡 */
             display: flex; align-items: flex-end; justify-content: center;
         }
-        .slide.active { opacity: 1; } /* 激活状态显示 */
+        .slide.active { opacity: 1; }
         
         .slide img {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; display: block;
         }
-        .slide::before { /* 底部渐变遮罩，让文字更清晰 */
+        .slide::before {
             content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); z-index: 1;
         }
         .slide-caption {
             position: relative; z-index: 2; padding: 40px; text-align: center; color: #fff;
-            transform: translateY(20px); opacity: 0; transition: all 1s ease 0.5s; /* 文字延迟淡入 */
+            transform: translateY(20px); opacity: 0; transition: all 1s ease 0.5s;
         }
         .slide.active .slide-caption { transform: translateY(0); opacity: 1; }
         
@@ -122,7 +117,7 @@ nav {
         </div>
     </nav>
 
-       <!-- 全屏幻灯片展览 -->
+    <!-- 全屏幻灯片展览 -->
     <div class="hero-slideshow">
         <!-- 幻灯片 1 -->
         <div class="slide active">
@@ -150,25 +145,121 @@ nav {
         </div>
     </div>
 
-    <!-- 作品网格 -->
+    <!-- 作品网格（共 28 张，已随机打乱顺序） -->
     <section class="gallery-section">
         <h2 class="section-title">Selected Works</h2>
         <div class="gallery-grid">
             <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheAncientWasteland.jpg" alt="古老遗迹">
+                <div class="overlay"><h3>古老遗迹</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Wilderness.jpg" alt="Wilderness">
+                <div class="overlay"><h3>Wilderness</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Waves.jpg" alt="Waves">
+                <div class="overlay"><h3>Waves</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="AnywhereDoor.jpg" alt="任意门">
+                <div class="overlay"><h3>任意门</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Ethereal.jpg" alt="Ethereal">
+                <div class="overlay"><h3>Ethereal</h3><p>河北 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Paradise.jpg" alt="Paradise">
+                <div class="overlay"><h3>Paradise</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Clean.jpg" alt="净">
+                <div class="overlay"><h3>净</h3><p>四川 · 2025</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="MarchofFlames.jpg" alt="烈焰进行曲">
+                <div class="overlay"><h3>烈焰进行曲</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="FallingDew.jpg" alt="垂露">
+                <div class="overlay"><h3>垂露</h3><p>贵阳 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="ABladeAboveFrost.jpg" alt="寒天之刃">
+                <div class="overlay"><h3>寒天之刃</h3><p>四川 · 2025</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheDepths.jpg" alt="TheDepths">
+                <div class="overlay"><h3>TheDepths</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Samsara.jpg" alt="乾坤">
+                <div class="overlay"><h3>乾坤</h3><p>北京 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Flow.jpg" alt="流淌">
+                <div class="overlay"><h3>流淌</h3><p>北京 · 2023</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheGreatGrassland.jpg" alt="大草原">
+                <div class="overlay"><h3>大草原</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="HiddenRealm.jpg" alt="隐秘之境">
+                <div class="overlay"><h3>隐秘之境</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Curl.jpg" alt="Curl">
+                <div class="overlay"><h3>Curl</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="AutumnEmerges.jpg" alt="秋色乍现">
+                <div class="overlay"><h3>秋色乍现</h3><p>四川 · 2025</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="AThousandTowers.jpg" alt="千塔之城">
-                <div class="overlay"><h3>A Thousand Towers</h3><p>Urban Landscape</p></div>
+                <div class="overlay"><h3>千塔之城</h3><p>新疆 · 2026</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="your-photo-2.jpg" alt="作品标题">
-                <div class="overlay"><h3>Silent Valley</h3><p>Nature</p></div>
+                <img src="ColdAir.jpg" alt="空气微凉">
+                <div class="overlay"><h3>空气微凉</h3><p>四川 · 2025</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="your-photo-3.jpg" alt="作品标题">
-                <div class="overlay"><h3>Neon Nights</h3><p>Street</p></div>
+                <img src="FirstLight.jpg" alt="FirstLight">
+                <div class="overlay"><h3>FirstLight</h3><p>新疆 · 2026</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="your-photo-4.jpg" alt="作品标题">
-                <div class="overlay"><h3>Morning Mist</h3><p>Landscape</p></div>
+                <img src="Tempest.jpg" alt="暴风雨">
+                <div class="overlay"><h3>暴风雨</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Isekai.jpg" alt="异世界">
+                <div class="overlay"><h3>异世界</h3><p>北京 · 2021</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="WorldofSnow.jpg" alt="白雪世界">
+                <div class="overlay"><h3>白雪世界</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="StoneEye.jpg" alt="Stone's Eye">
+                <div class="overlay"><h3>Stone's Eye</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Morning.jpg" alt="清晨">
+                <div class="overlay"><h3>清晨</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="SleepWalking.jpg" alt="梦游">
+                <div class="overlay"><h3>梦游</h3><p>内蒙 · 2022</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Dawn.jpg" alt="暮光">
+                <div class="overlay"><h3>暮光</h3><p>新疆 · 2026</p></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="BathofLight.jpg" alt="Bath of Light">
+                <div class="overlay"><h3>Bath of Light</h3><p>内蒙 · 2022</p></div>
             </div>
         </div>
     </section>
@@ -182,21 +273,17 @@ nav {
     <footer>&copy; 2024 T. J. ART. All Rights Reserved.</footer>
 
     <script>
-        // --- 1. 全屏幻灯片逻辑 (加减速 + 停留5秒) ---
+        // --- 1. 全屏幻灯片逻辑 (加减速 + 停留) ---
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
-        const INTERVAL_TIME = 5000; // 停留
+        const INTERVAL_TIME = 5000; // 停留毫秒，如需10秒请改为 10000
 
         function nextSlide() {
-            // 移除当前激活状态
             slides[currentSlide].classList.remove('active');
-            // 切换到下一张 (循环)
             currentSlide = (currentSlide + 1) % slides.length;
-            // 添加激活状态 (触发CSS的加减速过渡)
             slides[currentSlide].classList.add('active');
         }
 
-        // 每5秒切换一次
         setInterval(nextSlide, INTERVAL_TIME);
 
         // --- 2. 图片放大逻辑 ---
@@ -215,7 +302,6 @@ nav {
             document.body.style.overflow = 'auto';
         }
 
-        // 按 ESC 键关闭
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();
         });
