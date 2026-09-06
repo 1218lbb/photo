@@ -902,123 +902,158 @@
 
     <footer>&copy; 2026 T. J. ART. All Rights Reserved.</footer>
 
-
 <script>
-    /* --- 1. 全屏幻灯片逻辑 --- */
+    /* ============================================================
+       1. 全屏幻灯片逻辑
+       ============================================================ */
 
     const slides = document.querySelectorAll('.slide');
     let currentSlide = 0;
     const INTERVAL_TIME = 5000;
 
     function nextSlide() {
+
+        if (!slides.length) return;
+
         slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
+
+        currentSlide =
+            (currentSlide + 1) % slides.length;
+
         slides[currentSlide].classList.add('active');
     }
 
     setInterval(nextSlide, INTERVAL_TIME);
 
 
-    /* --- 2. 导航栏滚动渐变逻辑 --- */
+    /* ============================================================
+       2. 导航栏滚动渐变逻辑
+       ============================================================ */
 
-    const nav = document.querySelector('nav');
-    const heroSection = document.querySelector('.hero-slideshow');
+    const nav =
+        document.querySelector('nav');
 
-    window.addEventListener('scroll', () => {
-
-        if (window.scrollY > heroSection.offsetHeight - 100) {
-            nav.classList.add('scrolled');
-        } else {
-            nav.classList.remove('scrolled');
-        }
-
-    });
+    const heroSection =
+        document.querySelector('.hero-slideshow');
 
 
-    /* --- 3. 图片放大与切换逻辑 --- */
+    if (nav && heroSection) {
 
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
+        window.addEventListener(
+            'scroll',
+            () => {
 
-    const galleryItems = Array.from(
-        document.querySelectorAll('.gallery-item')
-    );
+                if (
+                    window.scrollY >
+                    heroSection.offsetHeight - 100
+                ) {
+
+                    nav.classList.add(
+                        'scrolled'
+                    );
+
+                } else {
+
+                    nav.classList.remove(
+                        'scrolled'
+                    );
+                }
+            }
+        );
+    }
+
+
+    /* ============================================================
+       3. 图片放大与切换逻辑
+       ============================================================ */
+
+    const lightbox =
+        document.getElementById(
+            'lightbox'
+        );
+
+    const lightboxImg =
+        document.getElementById(
+            'lightbox-img'
+        );
+
+
+    const galleryItems =
+        Array.from(
+            document.querySelectorAll(
+                '.gallery-item'
+            )
+        );
+
 
     let currentImageIndex = 0;
 
 
-    /*
-     * ============================================================
-     * 图片状态
-     * ============================================================
-     */
+    /* ============================================================
+       图片当前状态
+       ============================================================ */
 
     let imageScale = 1;
+
     let defaultScale = 1;
+
 
     let imageX = 0;
     let imageY = 0;
+
 
     let defaultX = 0;
     let defaultY = 0;
 
 
-    /*
-     * 平滑动画
-     */
+    /* ============================================================
+       动画状态
+       ============================================================ */
 
     let animationFrame = null;
 
 
-    /*
-     * 当前是否放大
-     */
+    /* ============================================================
+       是否处于放大状态
+       ============================================================ */
 
     let isZoomed = false;
 
 
-    /*
-     * ============================================================
-     * 缩放参数
-     * ============================================================
-     *
-     * WHEEL_ZOOM_IN = 1.50
-     *
-     * 每滚动一次：
-     *
-     * 放大：
-     *     当前倍率 × 1.5
-     *
-     * 缩小：
-     *     当前倍率 ÷ 1.5
-     *
-     *
-     * CLICK_ZOOM = 3.0
-     *
-     * 默认状态单击图片：
-     *
-     *     默认倍率 × 3
-     *
-     * 相比之前的 1.6，大幅增加。
-     *
-     *
-     * MAX_ZOOM = 10
-     *
-     * 最大允许放大到 10 倍。
-     */
+    /* ============================================================
+       缩放参数
+       ============================================================ */
 
     const MAX_ZOOM = 10;
 
-    const CLICK_ZOOM = 3.0;
+    const CLICK_ZOOM = 2.4;
 
     const WHEEL_ZOOM_IN = 1.5;
 
 
     /*
-     * ============================================================
-     * 鼠标拖动状态
-     * ============================================================
+     * 缩放动画：
+     *
+     * 原来 220ms
+     * 现在 110ms
      */
+
+    const ZOOM_ANIMATION_TIME = 110;
+
+
+    /*
+     * 恢复默认：
+     *
+     * 原来 280ms
+     * 现在 140ms
+     */
+
+    const RESET_ANIMATION_TIME = 140;
+
+
+    /* ============================================================
+       鼠标拖动状态
+       ============================================================ */
 
     let isDragging = false;
 
@@ -1034,116 +1069,218 @@
     let hasDragged = false;
 
 
+    /* ============================================================
+       手机触控状态
+       ============================================================ */
+
     /*
-     * ============================================================
-     * 触控状态
-     * ============================================================
-     *
-     * 只处理：
-     *
-     *     两指 → 缩放
-     *
-     * 两指中点 → 缩放中心
-     *
-     * 例如：
-     *
-     *        ↖     ↗
-     *          ●
-     *        ↙     ↘
-     *
-     * ● = 两指中点
+     * 是否正在进行两指缩放
      */
 
     let isPinching = false;
 
+
+    /*
+     * 两指缩放开始时的距离
+     */
+
     let pinchStartDistance = 0;
+
+
+    /*
+     * 两指缩放开始时的倍率
+     */
 
     let pinchStartScale = 1;
 
-    let pinchStartX = 0;
-    let pinchStartY = 0;
+
+    /*
+     * 两指中点
+     */
 
     let pinchCenterX = 0;
     let pinchCenterY = 0;
 
+
+    /*
+     * 两指中点对应的原图坐标
+     */
+
     let pinchImagePointX = 0;
     let pinchImagePointY = 0;
 
-    /*
-     * 防止两指缩放结束后，
-     * 浏览器产生一个 click，
-     * 导致图片又执行一次单击放大/缩小。
-     */
-
-    let suppressNextClick = false;
-
 
     /*
-     * ============================================================
-     * 打开图片
-     * ============================================================
+     * ------------------------------------------------------------
+     * 单指触控
+     * ------------------------------------------------------------
+     *
+     * 默认状态：
+     *
+     *     左滑 → 上一张
+     *     右滑 → 下一张
+     *
+     *
+     * 放大状态：
+     *
+     *     单指滑动 → 平移图片
      */
+
+    let isTouching = false;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    let touchLastX = 0;
+    let touchLastY = 0;
+
+    let touchMoved = false;
+
+
+    /*
+     * 判断这次触控是否为滑动。
+     */
+
+    const SWIPE_THRESHOLD = 50;
+
+
+    /*
+     * 用于区分：
+     *
+     * 单指滑动
+     *
+     * 和
+     *
+     * 单击
+     */
+
+    const TOUCH_MOVE_THRESHOLD = 8;
+
+
+    /*
+     * 最近一次触控是否为两指操作。
+     *
+     * 用于避免两指缩放结束后产生错误 click。
+     */
+
+    let lastTouchWasPinch = false;
+
+    let touchEndTime = 0;
+
+
+    /* ============================================================
+       打开图片
+       ============================================================ */
 
     function openLightbox(element) {
 
         currentImageIndex =
-            galleryItems.indexOf(element);
+            galleryItems.indexOf(
+                element
+            );
 
-        lightbox.classList.add('active');
 
-        document.body.style.overflow = 'hidden';
+        lightbox.classList.add(
+            'active'
+        );
 
-        showImage(currentImageIndex);
+
+        document.body.style.overflow =
+            'hidden';
+
+
+        showImage(
+            currentImageIndex
+        );
     }
 
 
-    /*
-     * ============================================================
-     * 显示图片
-     * ============================================================
-     */
+    /* ============================================================
+       显示图片
+       ============================================================ */
 
     function showImage(index) {
 
-        if (index < 0) {
-            index = galleryItems.length - 1;
+        if (!galleryItems.length) {
+            return;
         }
 
-        if (index >= galleryItems.length) {
+
+        if (index < 0) {
+
+            index =
+                galleryItems.length - 1;
+        }
+
+
+        if (
+            index >=
+            galleryItems.length
+        ) {
+
             index = 0;
         }
 
+
         currentImageIndex = index;
 
+
+        /*
+         * 每换一张图片，
+         * 取消之前的拖动和触控状态。
+         */
+
+        isDragging = false;
+        isPinching = false;
+        isTouching = false;
+        hasDragged = false;
+        touchMoved = false;
+
+
         const img =
-            galleryItems[currentImageIndex].querySelector('img');
+            galleryItems[
+                currentImageIndex
+            ].querySelector(
+                'img'
+            );
 
 
-        lightboxImg.onload = function() {
-
-            resetImageView();
-
-        };
+        if (!img) {
+            return;
+        }
 
 
-        lightboxImg.src = img.src;
+        lightboxImg.onload =
+            function() {
 
-        lightboxImg.alt = img.alt;
+                resetImageView(
+                    false
+                );
+            };
 
 
-        if (lightboxImg.complete) {
+        lightboxImg.src =
+            img.src;
 
-            resetImageView();
 
+        lightboxImg.alt =
+            img.alt;
+
+
+        if (
+            lightboxImg.complete
+        ) {
+
+            resetImageView(
+                false
+            );
         }
     }
 
 
-    /*
-     * ============================================================
-     * 计算默认视角
-     * ============================================================
-     */
+    /* ============================================================
+       计算默认视角
+       ============================================================ */
 
     function calculateDefaultView() {
 
@@ -1151,6 +1288,7 @@
             !lightboxImg.naturalWidth ||
             !lightboxImg.naturalHeight
         ) {
+
             return;
         }
 
@@ -1171,6 +1309,7 @@
 
         const fitScale =
             Math.min(
+
                 availableWidth /
                     lightboxImg.naturalWidth,
 
@@ -1180,7 +1319,7 @@
 
 
         /*
-         * 默认倍率最多为 100%
+         * 默认倍率最大为100%。
          */
 
         defaultScale =
@@ -1194,30 +1333,36 @@
             lightboxImg.naturalWidth *
             defaultScale;
 
+
         const displayHeight =
             lightboxImg.naturalHeight *
             defaultScale;
 
 
         defaultX =
-            (viewportWidth - displayWidth) / 2;
+            (
+                viewportWidth -
+                displayWidth
+            ) / 2;
+
 
         defaultY =
-            (viewportHeight - displayHeight) / 2;
+            (
+                viewportHeight -
+                displayHeight
+            ) / 2;
     }
 
 
-    /*
-     * ============================================================
-     * 平滑动画
-     * ============================================================
-     */
+    /* ============================================================
+       平滑动画
+       ============================================================ */
 
     function animateTo(
         targetScale,
         targetX,
         targetY,
-        duration = 260
+        duration = ZOOM_ANIMATION_TIME
     ) {
 
         if (animationFrame) {
@@ -1226,6 +1371,7 @@
                 animationFrame
             );
 
+            animationFrame = null;
         }
 
 
@@ -1238,11 +1384,14 @@
         const startY =
             imageY;
 
+
         const startTime =
             performance.now();
 
 
-        function animate(currentTime) {
+        function animate(
+            currentTime
+        ) {
 
             const elapsed =
                 currentTime -
@@ -1251,10 +1400,15 @@
 
             const progress =
                 Math.min(
-                    elapsed / duration,
+                    elapsed /
+                        duration,
                     1
                 );
 
+
+            /*
+             * ease-out
+             */
 
             const eased =
                 1 -
@@ -1266,26 +1420,37 @@
 
             imageScale =
                 startScale +
-                (targetScale - startScale) *
+                (
+                    targetScale -
+                    startScale
+                ) *
                 eased;
 
 
             imageX =
                 startX +
-                (targetX - startX) *
+                (
+                    targetX -
+                    startX
+                ) *
                 eased;
 
 
             imageY =
                 startY +
-                (targetY - startY) *
+                (
+                    targetY -
+                    startY
+                ) *
                 eased;
 
 
             updateImageTransform();
 
 
-            if (progress < 1) {
+            if (
+                progress < 1
+            ) {
 
                 animationFrame =
                     requestAnimationFrame(
@@ -1294,7 +1459,9 @@
 
             } else {
 
-                animationFrame = null;
+                animationFrame =
+                    null;
+
 
                 imageScale =
                     targetScale;
@@ -1304,6 +1471,7 @@
 
                 imageY =
                     targetY;
+
 
                 updateImageTransform();
             }
@@ -1317,11 +1485,9 @@
     }
 
 
-    /*
-     * ============================================================
-     * 更新图片位置
-     * ============================================================
-     */
+    /* ============================================================
+       更新图片 Transform
+       ============================================================ */
 
     function updateImageTransform() {
 
@@ -1330,30 +1496,51 @@
     }
 
 
-    /*
-     * ============================================================
-     * 恢复默认视角
-     * ============================================================
-     */
+    /* ============================================================
+       恢复默认视角
+       ============================================================ */
 
-    function resetImageView(animated = false) {
+    function resetImageView(
+        animated = false
+    ) {
 
         calculateDefaultView();
 
+
         isZoomed = false;
 
-        lightbox.classList.remove('zoomed');
 
-        lightbox.classList.remove('dragging');
+        lightbox.classList.remove(
+            'zoomed'
+        );
+
+
+        lightbox.classList.remove(
+            'dragging'
+        );
+
+
+        if (animationFrame) {
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            animationFrame = null;
+        }
 
 
         if (animated) {
 
             animateTo(
+
                 defaultScale,
+
                 defaultX,
+
                 defaultY,
-                280
+
+                RESET_ANIMATION_TIME
             );
 
         } else {
@@ -1372,11 +1559,9 @@
     }
 
 
-    /*
-     * ============================================================
-     * 判断是否为默认视角
-     * ============================================================
-     */
+    /* ============================================================
+       判断是否为默认视角
+       ============================================================ */
 
     function isAtDefaultView() {
 
@@ -1387,11 +1572,9 @@
     }
 
 
-    /*
-     * ============================================================
-     * 以指定位置为中心进行平滑缩放
-     * ============================================================
-     */
+    /* ============================================================
+       以指定位置为中心进行缩放
+       ============================================================ */
 
     function smoothZoomAt(
         clientX,
@@ -1399,13 +1582,16 @@
         targetScale
     ) {
 
-        if (!lightboxImg.naturalWidth) {
+        if (
+            !lightboxImg.naturalWidth
+        ) {
+
             return;
         }
 
 
         /*
-         * 不允许小于默认倍率
+         * 不允许低于默认倍率。
          */
 
         targetScale =
@@ -1416,7 +1602,7 @@
 
 
         /*
-         * 最大10倍
+         * 最大10倍。
          */
 
         targetScale =
@@ -1428,7 +1614,7 @@
 
         /*
          * 缩小到默认倍率：
-         * 自动恢复默认位置。
+         * 自动回到默认位置。
          */
 
         if (
@@ -1436,7 +1622,9 @@
             defaultScale + 0.0001
         ) {
 
-            resetImageView(true);
+            resetImageView(
+                true
+            );
 
             return;
         }
@@ -1447,26 +1635,35 @@
 
 
         /*
-         * 找到鼠标位置对应的原图坐标
+         * 鼠标/触控点对应的原图坐标。
          */
 
         const imagePointX =
-            (clientX - imageX) /
+            (
+                clientX -
+                imageX
+            ) /
             currentScale;
 
+
         const imagePointY =
-            (clientY - imageY) /
+            (
+                clientY -
+                imageY
+            ) /
             currentScale;
 
 
         /*
-         * 新倍率下保持这个点不动
+         * 保持这个原图点位于
+         * 鼠标/触控位置。
          */
 
         const targetX =
             clientX -
             imagePointX *
             targetScale;
+
 
         const targetY =
             clientY -
@@ -1476,31 +1673,28 @@
 
         isZoomed = true;
 
-        lightbox.classList.add('zoomed');
+
+        lightbox.classList.add(
+            'zoomed'
+        );
 
 
         animateTo(
+
             targetScale,
+
             targetX,
+
             targetY,
-            220
+
+            ZOOM_ANIMATION_TIME
         );
     }
 
 
-    /*
-     * ============================================================
-     * 鼠标滚轮缩放
-     * ============================================================
-     *
-     * 每次滚轮：
-     *
-     *     放大 × 1.5
-     *
-     *     缩小 ÷ 1.5
-     *
-     * 鼠标位置始终作为缩放中心。
-     */
+    /* ============================================================
+       鼠标滚轮缩放
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'wheel',
@@ -1510,12 +1704,15 @@
             e.stopPropagation();
 
 
-            if (e.deltaY < 0) {
+            /*
+             * 向上滚：
+             *
+             * ×1.5
+             */
 
-                /*
-                 * 向上滚：
-                 * 快速放大
-                 */
+            if (
+                e.deltaY < 0
+            ) {
 
                 const targetScale =
                     imageScale *
@@ -1523,8 +1720,11 @@
 
 
                 smoothZoomAt(
+
                     e.clientX,
+
                     e.clientY,
+
                     targetScale
                 );
 
@@ -1533,7 +1733,8 @@
 
                 /*
                  * 向下滚：
-                 * 快速缩小
+                 *
+                 * ÷1.5
                  */
 
                 const targetScale =
@@ -1546,13 +1747,18 @@
                     defaultScale + 0.001
                 ) {
 
-                    resetImageView(true);
+                    resetImageView(
+                        true
+                    );
 
                 } else {
 
                     smoothZoomAt(
+
                         e.clientX,
+
                         e.clientY,
+
                         targetScale
                     );
                 }
@@ -1565,25 +1771,9 @@
     );
 
 
-    /*
-     * ============================================================
-     * 左键单击
-     * ============================================================
-     *
-     * 默认状态：
-     *
-     *     单击 → 大幅放大 × 3
-     *
-     *
-     * 已经放大：
-     *
-     *     单击 → 恢复默认
-     *
-     *
-     * 刚刚拖动：
-     *
-     *     忽略 click
-     */
+    /* ============================================================
+       鼠标左键单击
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'click',
@@ -1594,20 +1784,33 @@
 
 
             /*
-             * 两指缩放结束后，
-             * 忽略浏览器产生的 click。
+             * 两指缩放结束后的 click，
+             * 如果距离 touchend 很近，
+             * 认为它是浏览器产生的触控 click。
+             *
+             * 不执行任何操作。
              */
 
-            if (suppressNextClick) {
+            if (
+                lastTouchWasPinch &&
+                Date.now() -
+                touchEndTime <
+                350
+            ) {
 
-                suppressNextClick = false;
+                lastTouchWasPinch =
+                    false;
 
                 return;
             }
 
 
+            lastTouchWasPinch =
+                false;
+
+
             /*
-             * 拖动结束后的 click 不处理
+             * 鼠标拖动后的 click 不处理。
              */
 
             if (hasDragged) {
@@ -1621,8 +1824,7 @@
             /*
              * 默认状态：
              *
-             * 单击直接放大到
-             * 默认倍率 × 3
+             * 单击 → 放大2.4倍
              */
 
             if (
@@ -1632,17 +1834,23 @@
 
                 const targetScale =
                     Math.min(
+
                         MAX_ZOOM,
+
                         defaultScale *
                         CLICK_ZOOM
                     );
 
 
                 smoothZoomAt(
+
                     e.clientX,
+
                     e.clientY,
+
                     targetScale
                 );
+
 
                 return;
             }
@@ -1651,33 +1859,41 @@
             /*
              * 已经放大：
              *
-             * 单击恢复默认
+             * 单击 → 恢复默认
              */
 
-            resetImageView(true);
+            resetImageView(
+                true
+            );
         }
     );
 
 
-    /*
-     * ============================================================
-     * 鼠标开始拖动
-     * ============================================================
-     */
+    /* ============================================================
+       鼠标开始拖动
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'mousedown',
         (e) => {
 
-            if (e.button !== 0) {
+            if (
+                e.button !== 0
+            ) {
+
                 return;
             }
 
+
+            /*
+             * 默认状态不能拖动。
+             */
 
             if (
                 !isZoomed ||
                 isAtDefaultView()
             ) {
+
                 return;
             }
 
@@ -1722,11 +1938,9 @@
     );
 
 
-    /*
-     * ============================================================
-     * 鼠标移动
-     * ============================================================
-     */
+    /* ============================================================
+       鼠标移动
+       ============================================================ */
 
     document.addEventListener(
         'mousemove',
@@ -1740,6 +1954,7 @@
             const deltaX =
                 e.clientX -
                 dragStartX;
+
 
             const deltaY =
                 e.clientY -
@@ -1761,6 +1976,7 @@
                 dragImageStartX +
                 deltaX;
 
+
             imageY =
                 dragImageStartY +
                 deltaY;
@@ -1771,11 +1987,9 @@
     );
 
 
-    /*
-     * ============================================================
-     * 鼠标结束拖动
-     * ============================================================
-     */
+    /* ============================================================
+       鼠标结束拖动
+       ============================================================ */
 
     document.addEventListener(
         'mouseup',
@@ -1788,6 +2002,7 @@
 
             isDragging = false;
 
+
             lightbox.classList.remove(
                 'dragging'
             );
@@ -1795,17 +2010,34 @@
     );
 
 
-    /*
-     * ============================================================
-     * 两指触控工具函数
-     * ============================================================
-     */
+    /* ============================================================
+       双击
+       ============================================================ */
 
-    function getTouchDistance(touch1, touch2) {
+    lightboxImg.addEventListener(
+        'dblclick',
+        (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    );
+
+
+    /* ============================================================
+       手机触控：
+       两指距离
+       ============================================================ */
+
+    function getTouchDistance(
+        touch1,
+        touch2
+    ) {
 
         const dx =
             touch2.clientX -
             touch1.clientX;
+
 
         const dy =
             touch2.clientY -
@@ -1819,273 +2051,194 @@
     }
 
 
-    function getTouchCenter(touch1, touch2) {
+    /* ============================================================
+       手机触控：
+       两指中点
+       ============================================================ */
+
+    function getTouchCenter(
+        touch1,
+        touch2
+    ) {
 
         return {
 
             x:
-                (touch1.clientX +
-                 touch2.clientX) / 2,
+                (
+                    touch1.clientX +
+                    touch2.clientX
+                ) / 2,
 
             y:
-                (touch1.clientY +
-                 touch2.clientY) / 2
-
+                (
+                    touch1.clientY +
+                    touch2.clientY
+                ) / 2
         };
     }
 
 
-    /*
-     * ============================================================
-     * 两指开始
-     * ============================================================
-     */
+    /* ============================================================
+       手机触控开始
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'touchstart',
         (e) => {
 
             /*
-             * 只有两指才启动缩放
+             * ====================================================
+             * 两指
+             * ====================================================
              */
 
-            if (e.touches.length !== 2) {
-                return;
-            }
+            if (
+                e.touches.length === 2
+            ) {
+
+                e.preventDefault();
+                e.stopPropagation();
 
 
-            e.preventDefault();
-            e.stopPropagation();
+                /*
+                 * 如果正在动画，
+                 * 立即停止。
+                 */
 
-
-            /*
-             * 如果之前正在动画，
-             * 立即停止。
-             */
-
-            if (animationFrame) {
-
-                cancelAnimationFrame(
+                if (
                     animationFrame
-                );
+                ) {
 
-                animationFrame = null;
-            }
+                    cancelAnimationFrame(
+                        animationFrame
+                    );
 
-
-            isPinching = true;
-
-            suppressNextClick = true;
-
-
-            const touch1 =
-                e.touches[0];
-
-            const touch2 =
-                e.touches[1];
+                    animationFrame = null;
+                }
 
 
-            pinchStartDistance =
-                getTouchDistance(
-                    touch1,
-                    touch2
-                );
+                isPinching = true;
+
+                isTouching = false;
 
 
-            pinchStartScale =
-                imageScale;
+                const touch1 =
+                    e.touches[0];
+
+                const touch2 =
+                    e.touches[1];
 
 
-            const center =
-                getTouchCenter(
-                    touch1,
-                    touch2
-                );
+                /*
+                 * 初始两指距离
+                 */
+
+                pinchStartDistance =
+                    getTouchDistance(
+                        touch1,
+                        touch2
+                    );
 
 
-            pinchCenterX =
-                center.x;
+                /*
+                 * 初始倍率
+                 */
 
-            pinchCenterY =
-                center.y;
-
-
-            /*
-             * 记录两指中点对应的原图位置。
-             *
-             * 后面无论两指怎么移动，
-             * 都让这个原图位置保持在新的两指中点。
-             */
-
-            pinchImagePointX =
-                (pinchCenterX - imageX) /
-                pinchStartScale;
-
-            pinchImagePointY =
-                (pinchCenterY - imageY) /
-                pinchStartScale;
+                pinchStartScale =
+                    imageScale;
 
 
-            isZoomed = true;
+                /*
+                 * 初始两指中心
+                 */
 
-            lightbox.classList.add(
-                'zoomed'
-            );
-        },
-        {
-            passive: false
-        }
-    );
-
-
-    /*
-     * ============================================================
-     * 两指移动
-     * ============================================================
-     *
-     * 两指距离变大：
-     *     放大
-     *
-     * 两指距离变小：
-     *     缩小
-     *
-     * 同时：
-     *     两指中点移动
-     *     → 图片跟随缩放中心移动
-     */
-
-    lightboxImg.addEventListener(
-        'touchmove',
-        (e) => {
-
-            if (
-                !isPinching ||
-                e.touches.length !== 2
-            ) {
-                return;
-            }
+                const center =
+                    getTouchCenter(
+                        touch1,
+                        touch2
+                    );
 
 
-            e.preventDefault();
-            e.stopPropagation();
+                pinchCenterX =
+                    center.x;
+
+                pinchCenterY =
+                    center.y;
 
 
-            const touch1 =
-                e.touches[0];
+                /*
+                 * 两指中心对应的原图坐标。
+                 */
 
-            const touch2 =
-                e.touches[1];
-
-
-            const currentDistance =
-                getTouchDistance(
-                    touch1,
-                    touch2
-                );
+                pinchImagePointX =
+                    (
+                        pinchCenterX -
+                        imageX
+                    ) /
+                    pinchStartScale;
 
 
-            if (
-                pinchStartDistance <= 0
-            ) {
-                return;
-            }
+                pinchImagePointY =
+                    (
+                        pinchCenterY -
+                        imageY
+                    ) /
+                    pinchStartScale;
 
-
-            /*
-             * 根据两指距离计算倍率
-             */
-
-            let targetScale =
-                pinchStartScale *
-                (
-                    currentDistance /
-                    pinchStartDistance
-                );
-
-
-            /*
-             * 限制最小倍率
-             */
-
-            targetScale =
-                Math.max(
-                    defaultScale,
-                    targetScale
-                );
-
-
-            /*
-             * 限制最大倍率
-             */
-
-            targetScale =
-                Math.min(
-                    MAX_ZOOM,
-                    targetScale
-                );
-
-
-            /*
-             * 计算新的两指中点
-             */
-
-            const center =
-                getTouchCenter(
-                    touch1,
-                    touch2
-                );
-
-
-            pinchCenterX =
-                center.x;
-
-            pinchCenterY =
-                center.y;
-
-
-            /*
-             * 保持原图中的同一个点
-             * 位于两指中点。
-             */
-
-            imageScale =
-                targetScale;
-
-
-            imageX =
-                pinchCenterX -
-                pinchImagePointX *
-                targetScale;
-
-
-            imageY =
-                pinchCenterY -
-                pinchImagePointY *
-                targetScale;
-
-
-            /*
-             * 如果缩放到了默认倍率，
-             * 暂时仍然直接显示。
-             *
-             * 两指松开后再平滑回到默认位置。
-             */
-
-            if (
-                imageScale >
-                defaultScale + 0.001
-            ) {
 
                 isZoomed = true;
+
 
                 lightbox.classList.add(
                     'zoomed'
                 );
 
+
+                return;
             }
 
 
-            updateImageTransform();
+            /*
+             * ====================================================
+             * 单指
+             * ====================================================
+             */
+
+            if (
+                e.touches.length === 1
+            ) {
+
+                const touch =
+                    e.touches[0];
+
+
+                isTouching = true;
+
+                touchMoved = false;
+
+
+                touchStartX =
+                    touch.clientX;
+
+                touchStartY =
+                    touch.clientY;
+
+
+                touchLastX =
+                    touch.clientX;
+
+                touchLastY =
+                    touch.clientY;
+
+
+                /*
+                 * 新的一次单指触控，
+                 * 不属于上一次 pinch。
+                 */
+
+                lastTouchWasPinch =
+                    false;
+            }
         },
         {
             passive: false
@@ -2093,64 +2246,499 @@
     );
 
 
-    /*
-     * ============================================================
-     * 两指结束
-     * ============================================================
-     */
+    /* ============================================================
+       手机触控移动
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'touchmove',
+        (e) => {
+
+            /*
+             * ====================================================
+             * 两指缩放
+             * ====================================================
+             */
+
+            if (
+                isPinching &&
+                e.touches.length === 2
+            ) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+
+                const touch1 =
+                    e.touches[0];
+
+                const touch2 =
+                    e.touches[1];
+
+
+                const currentDistance =
+                    getTouchDistance(
+                        touch1,
+                        touch2
+                    );
+
+
+                if (
+                    pinchStartDistance <= 0
+                ) {
+
+                    return;
+                }
+
+
+                /*
+                 * 根据两指距离计算倍率。
+                 */
+
+                let targetScale =
+                    pinchStartScale *
+                    (
+                        currentDistance /
+                        pinchStartDistance
+                    );
+
+
+                /*
+                 * 最小默认倍率。
+                 */
+
+                targetScale =
+                    Math.max(
+                        defaultScale,
+                        targetScale
+                    );
+
+
+                /*
+                 * 最大10倍。
+                 */
+
+                targetScale =
+                    Math.min(
+                        MAX_ZOOM,
+                        targetScale
+                    );
+
+
+                /*
+                 * 当前两指中心。
+                 */
+
+                const center =
+                    getTouchCenter(
+                        touch1,
+                        touch2
+                    );
+
+
+                pinchCenterX =
+                    center.x;
+
+                pinchCenterY =
+                    center.y;
+
+
+                /*
+                 * 实时更新倍率。
+                 */
+
+                imageScale =
+                    targetScale;
+
+
+                /*
+                 * 让同一个原图点保持
+                 * 位于两指中心。
+                 */
+
+                imageX =
+                    pinchCenterX -
+                    pinchImagePointX *
+                    targetScale;
+
+
+                imageY =
+                    pinchCenterY -
+                    pinchImagePointY *
+                    targetScale;
+
+
+                updateImageTransform();
+
+
+                /*
+                 * 判断是否回到默认倍率。
+                 */
+
+                if (
+                    imageScale <=
+                    defaultScale + 0.001
+                ) {
+
+                    isZoomed = false;
+
+                    lightbox.classList.remove(
+                        'zoomed'
+                    );
+
+                } else {
+
+                    isZoomed = true;
+
+                    lightbox.classList.add(
+                        'zoomed'
+                    );
+                }
+
+
+                return;
+            }
+
+
+            /*
+             * ====================================================
+             * 单指
+             * ====================================================
+             */
+
+            if (
+                !isTouching ||
+                e.touches.length !== 1
+            ) {
+
+                return;
+            }
+
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            const touch =
+                e.touches[0];
+
+
+            const currentX =
+                touch.clientX;
+
+            const currentY =
+                touch.clientY;
+
+
+            const totalDeltaX =
+                currentX -
+                touchStartX;
+
+
+            const totalDeltaY =
+                currentY -
+                touchStartY;
+
+
+            /*
+             * 判断是否真正发生移动。
+             */
+
+            if (
+                Math.abs(
+                    totalDeltaX
+                ) >
+                    TOUCH_MOVE_THRESHOLD ||
+                Math.abs(
+                    totalDeltaY
+                ) >
+                    TOUCH_MOVE_THRESHOLD
+            ) {
+
+                touchMoved = true;
+            }
+
+
+            /*
+             * ====================================================
+             * 放大状态
+             *
+             * 单指滑动 = 平移图片
+             * ====================================================
+             */
+
+            if (
+                isZoomed &&
+                !isAtDefaultView()
+            ) {
+
+                /*
+                 * 如果有动画，
+                 * 停止动画。
+                 */
+
+                if (
+                    animationFrame
+                ) {
+
+                    cancelAnimationFrame(
+                        animationFrame
+                    );
+
+                    animationFrame = null;
+                }
+
+
+                const deltaX =
+                    currentX -
+                    touchLastX;
+
+
+                const deltaY =
+                    currentY -
+                    touchLastY;
+
+
+                imageX +=
+                    deltaX;
+
+                imageY +=
+                    deltaY;
+
+
+                updateImageTransform();
+
+
+                touchLastX =
+                    currentX;
+
+                touchLastY =
+                    currentY;
+
+
+                return;
+            }
+
+
+            /*
+             * ====================================================
+             * 默认状态
+             *
+             * 单指滑动 = 准备切换图片
+             *
+             * 这里暂时不换图，
+             * 等 touchend 后判断方向。
+             * ====================================================
+             */
+
+            touchLastX =
+                currentX;
+
+            touchLastY =
+                currentY;
+        },
+        {
+            passive: false
+        }
+    );
+
+
+    /* ============================================================
+       手机触控结束
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'touchend',
         (e) => {
 
             /*
-             * 只要两指操作结束，
-             * 就结束 pinch。
+             * ====================================================
+             * 两指缩放结束
+             * ====================================================
              */
 
-            if (!isPinching) {
+            if (isPinching) {
+
+                /*
+                 * 如果仍然有两根手指，
+                 * 不结束。
+                 */
+
+                if (
+                    e.touches.length >= 2
+                ) {
+
+                    return;
+                }
+
+
+                isPinching = false;
+
+
+                /*
+                 * 标记刚刚进行了双指操作。
+                 */
+
+                lastTouchWasPinch =
+                    true;
+
+                touchEndTime =
+                    Date.now();
+
+
+                /*
+                 * 如果已经缩小到默认倍率，
+                 * 平滑回到默认位置。
+                 */
+
+                if (
+                    imageScale <=
+                    defaultScale + 0.001
+                ) {
+
+                    resetImageView(
+                        true
+                    );
+
+                } else {
+
+                    /*
+                     * 保持当前放大状态。
+                     */
+
+                    isZoomed = true;
+
+                    lightbox.classList.add(
+                        'zoomed'
+                    );
+                }
+
+
                 return;
             }
 
 
             /*
-             * 如果还有两根手指，
-             * 不结束。
+             * ====================================================
+             * 单指结束
+             * ====================================================
              */
 
-            if (e.touches.length >= 2) {
+            if (!isTouching) {
                 return;
             }
 
 
-            isPinching = false;
+            isTouching = false;
 
 
             /*
-             * 如果已经缩小到默认倍率：
+             * 如果这次单指发生了移动，
+             * 不允许后面的 click 再执行放大/恢复。
+             */
+
+            if (touchMoved) {
+
+                /*
+                 * ----------------------------------------------
+                 * 放大状态：
+                 *
+                 * 单指滑动只是平移
+                 * ----------------------------------------------
+                 */
+
+                if (
+                    isZoomed &&
+                    !isAtDefaultView()
+                ) {
+
+                    /*
+                     * 放大状态下不切换图片。
+                     */
+
+                    hasDragged = true;
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------
+                 * 默认状态：
+                 *
+                 * 单指左右滑动切换图片
+                 * ----------------------------------------------
+                 */
+
+                const deltaX =
+                    e.changedTouches[0]
+                        .clientX -
+                    touchStartX;
+
+
+                const deltaY =
+                    e.changedTouches[0]
+                        .clientY -
+                    touchStartY;
+
+
+                /*
+                 * 必须明显横向移动，
+                 * 才认为是左右滑动。
+                 *
+                 * 避免上下滑动页面时误切图片。
+                 */
+
+                if (
+                    Math.abs(deltaX) >
+                        SWIPE_THRESHOLD &&
+                    Math.abs(deltaX) >
+                        Math.abs(deltaY) * 1.2
+                ) {
+
+                    if (
+                        deltaX < 0
+                    ) {
+
+                        /*
+                         * 向左滑：
+                         * 下一张
+                         */
+
+                        nextImage();
+
+                    } else {
+
+                        /*
+                         * 向右滑：
+                         * 上一张
+                         */
+
+                        previousImage();
+                    }
+                }
+
+
+                /*
+                 * 防止这个 swipe 结束后
+                 * 产生 click。
+                 */
+
+                hasDragged = true;
+
+                return;
+            }
+
+
+            /*
+             * 没有移动：
              *
-             * 自动平滑回到默认位置。
+             * 这是一次单指触控。
+             *
+             * 不在 touchend 里执行放大，
+             * 交给 click 事件统一处理。
              */
 
-            if (
-                imageScale <=
-                defaultScale + 0.001
-            ) {
-
-                resetImageView(true);
-
-            }
-
-
-            /*
-             * 防止 touchend 后产生 click。
-             */
-
-            setTimeout(() => {
-
-                suppressNextClick = false;
-
-            }, 400);
         },
         {
             passive: false
@@ -2158,48 +2746,42 @@
     );
 
 
-    /*
-     * ============================================================
-     * 防止触摸过程中浏览器默认行为
-     * ============================================================
-     */
+    /* ============================================================
+       手机触控取消
+       ============================================================ */
 
     lightboxImg.addEventListener(
         'touchcancel',
         () => {
 
+            isTouching = false;
+
             isPinching = false;
 
-            setTimeout(() => {
+            touchMoved = false;
 
-                suppressNextClick = false;
+            lastTouchWasPinch = true;
 
-            }, 400);
+            touchEndTime =
+                Date.now();
+
+
+            if (
+                imageScale <=
+                defaultScale + 0.001
+            ) {
+
+                resetImageView(
+                    true
+                );
+            }
         }
     );
 
 
-    /*
-     * ============================================================
-     * 防止双击浏览器默认行为
-     * ============================================================
-     */
-
-    lightboxImg.addEventListener(
-        'dblclick',
-        (e) => {
-
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    );
-
-
-    /*
-     * ============================================================
-     * 窗口大小改变
-     * ============================================================
-     */
+    /* ============================================================
+       窗口大小改变
+       ============================================================ */
 
     window.addEventListener(
         'resize',
@@ -2210,20 +2792,21 @@
                     'active'
                 )
             ) {
+
                 return;
             }
 
 
-            resetImageView(false);
+            resetImageView(
+                false
+            );
         }
     );
 
 
-    /*
-     * ============================================================
-     * 下一张 / 上一张
-     * ============================================================
-     */
+    /* ============================================================
+       下一张
+       ============================================================ */
 
     function nextImage() {
 
@@ -2233,6 +2816,10 @@
     }
 
 
+    /* ============================================================
+       上一张
+       ============================================================ */
+
     function previousImage() {
 
         showImage(
@@ -2241,11 +2828,9 @@
     }
 
 
-    /*
-     * ============================================================
-     * 关闭图片
-     * ============================================================
-     */
+    /* ============================================================
+       关闭图片
+       ============================================================ */
 
     function closeLightbox() {
 
@@ -2253,9 +2838,11 @@
             'active'
         );
 
+
         lightbox.classList.remove(
             'zoomed'
         );
+
 
         lightbox.classList.remove(
             'dragging'
@@ -2266,11 +2853,15 @@
 
         isPinching = false;
 
+        isTouching = false;
+
         isZoomed = false;
 
         hasDragged = false;
 
-        suppressNextClick = false;
+        touchMoved = false;
+
+        lastTouchWasPinch = false;
 
 
         if (animationFrame) {
@@ -2289,19 +2880,25 @@
 
         /*
          * 如果当前处于浏览器全屏，
-         * 同时退出全屏。
+         * 关闭图片时同时退出全屏。
          */
 
-        if (document.fullscreenElement) {
+        if (
+            document.fullscreenElement
+        ) {
 
             document
                 .exitFullscreen()
-                .catch(() => {});
+                .catch(
+                    () => {}
+                );
         }
     }
 
 
-    /* --- 全屏功能 --- */
+    /* ============================================================
+       全屏功能
+       ============================================================ */
 
     async function toggleFullscreen(e) {
 
@@ -2314,7 +2911,9 @@
 
         try {
 
-            if (!document.fullscreenElement) {
+            if (
+                !document.fullscreenElement
+            ) {
 
                 await lightbox.requestFullscreen();
 
@@ -2333,9 +2932,9 @@
     }
 
 
-    /*
-     * 全屏状态变化后重新计算默认位置
-     */
+    /* ============================================================
+       全屏状态变化
+       ============================================================ */
 
     document.addEventListener(
         'fullscreenchange',
@@ -2346,22 +2945,28 @@
                     'active'
                 )
             ) {
+
                 return;
             }
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                resetImageView(false);
+                    resetImageView(
+                        false
+                    );
 
-            }, 50);
+                },
+                50
+            );
         }
     );
 
 
-    /*
-     * 更新全屏按钮图标
-     */
+    /* ============================================================
+       更新全屏按钮图标
+       ============================================================ */
 
     document.addEventListener(
         'fullscreenchange',
@@ -2378,7 +2983,9 @@
             }
 
 
-            if (document.fullscreenElement) {
+            if (
+                document.fullscreenElement
+            ) {
 
                 icon.innerHTML = `
                     <path d="M9 3H3v6"></path>
@@ -2400,7 +3007,9 @@
     );
 
 
-    /* --- 下载当前图片 --- */
+    /* ============================================================
+       下载当前图片
+       ============================================================ */
 
     function downloadCurrentImage(e) {
 
@@ -2423,7 +3032,9 @@
 
 
         const img =
-            currentItem.querySelector('img');
+            currentItem.querySelector(
+                'img'
+            );
 
 
         if (!img) {
@@ -2432,7 +3043,9 @@
 
 
         const link =
-            document.createElement('a');
+            document.createElement(
+                'a'
+            );
 
 
         link.href =
@@ -2451,15 +3064,23 @@
             'T.J.ART.jpg';
 
 
-        document.body.appendChild(link);
+        document.body.appendChild(
+            link
+        );
+
 
         link.click();
 
-        document.body.removeChild(link);
+
+        document.body.removeChild(
+            link
+        );
     }
 
 
-    /* --- 键盘操作 --- */
+    /* ============================================================
+       键盘操作
+       ============================================================ */
 
     document.addEventListener(
         'keydown',
@@ -2470,23 +3091,30 @@
                     'active'
                 )
             ) {
+
                 return;
             }
 
 
-            if (e.key === 'Escape') {
+            if (
+                e.key === 'Escape'
+            ) {
 
                 closeLightbox();
             }
 
 
-            if (e.key === 'ArrowRight') {
+            if (
+                e.key === 'ArrowRight'
+            ) {
 
                 nextImage();
             }
 
 
-            if (e.key === 'ArrowLeft') {
+            if (
+                e.key === 'ArrowLeft'
+            ) {
 
                 previousImage();
             }
@@ -2494,7 +3122,9 @@
     );
 
 
-    /* --- 4. ABOUT 页面逻辑 --- */
+    /* ============================================================
+       4. ABOUT 页面逻辑
+       ============================================================ */
 
     const aboutLink =
         document.getElementById(
@@ -2570,16 +3200,22 @@
     }
 
 
-    aboutLink.addEventListener(
-        'click',
-        openAbout
-    );
+    if (aboutLink) {
+
+        aboutLink.addEventListener(
+            'click',
+            openAbout
+        );
+    }
 
 
-    aboutBack.addEventListener(
-        'click',
-        closeAbout
-    );
+    if (aboutBack) {
+
+        aboutBack.addEventListener(
+            'click',
+            closeAbout
+        );
+    }
 
 
     document.addEventListener(
@@ -2587,6 +3223,7 @@
         (e) => {
 
             if (
+                aboutOverlay &&
                 aboutOverlay.classList.contains(
                     'active'
                 ) &&
@@ -2595,7 +3232,6 @@
 
                 closeAbout();
             }
-
         }
     );
 
