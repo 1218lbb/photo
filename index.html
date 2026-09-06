@@ -164,32 +164,36 @@
            背景不会出现黑色空洞。
            ============================================================ */
 
-        .slide::before {
-            content: '';
+  .slide::before {
+    content: '';
 
-            position: absolute;
+    position: absolute;
 
-            inset: -12%;
+    inset: -15%;
 
-            z-index: 0;
+    z-index: 0;
 
-            background-image:
-                var(--slide-background);
+    background-image:
+        var(--slide-background);
 
-            background-position: center center;
-            background-size: cover;
-            background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
 
-            filter:
-                blur(35px);
+    /*
+     * 模糊背景只负责填补主图片之外的空缺。
+     * 不降低亮度，保持原图亮度。
+     */
+    filter:
+        blur(35px);
 
-            transform:
-                scale(1.15);
+    transform:
+        scale(1.15);
 
-            opacity: 0.72;
+    opacity: 1;
 
-            pointer-events: none;
-        }
+    pointer-events: none;
+}
 
 
         /* ============================================================
