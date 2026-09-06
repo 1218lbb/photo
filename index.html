@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -15,9 +16,13 @@
 
         html {
             scroll-behavior: auto;
+            margin: 0;
+            padding: 0;
         }
 
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: #000;
             color: #e0e0e0;
@@ -204,10 +209,6 @@
                 padding: 0 25px;
                 text-align: center;
             }
-
-            .slide-caption {
-                bottom: 30px;
-            }
         }
 
         /* --- 5. 作品网格 --- */
@@ -327,9 +328,60 @@
             user-select: none;
             -webkit-user-drag: none;
             cursor: zoom-in;
+            will-change: transform;
         }
 
-        /* 返回箭头 - 样式与 ABOUT 的 BACK 一致 */
+        .lightbox.zoomed #lightbox-img {
+            cursor: grab;
+        }
+
+        .lightbox.dragging #lightbox-img {
+            cursor: grabbing;
+        }
+
+        /* --- 放大界面右上角按钮 --- */
+        .lightbox-tools {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            z-index: 1003;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lightbox-tool {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 3px;
+            color: rgba(255,255,255,0.9);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            padding: 0;
+        }
+
+        .lightbox-tool:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.7);
+            color: #fff;
+        }
+
+        .lightbox-tool svg {
+            width: 19px;
+            height: 19px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* 返回箭头 */
         .lightbox-back {
             position: absolute;
             top: 30px;
@@ -527,6 +579,17 @@
                 font-size: 11px;
             }
 
+            .lightbox-tools {
+                top: 20px;
+                right: 20px;
+                gap: 8px;
+            }
+
+            .lightbox-tool {
+                width: 38px;
+                height: 38px;
+            }
+
             .about-content {
                 width: calc(100% - 50px);
             }
@@ -563,7 +626,6 @@
     <!-- 全屏幻灯片展览 -->
     <div class="hero-slideshow">
 
-        <!-- 幻灯片 1 -->
         <div class="slide active">
             <img src="Wilderness.jpg" alt="作品1">
             <div class="slide-caption">
@@ -572,7 +634,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 2 -->
         <div class="slide">
             <img src="AThousandTowers.jpg" alt="作品2">
             <div class="slide-caption">
@@ -581,7 +642,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 3 -->
         <div class="slide">
             <img src="3AWorldofWhite.jpg" alt="作品3">
             <div class="slide-caption">
@@ -590,7 +650,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 4 -->
         <div class="slide">
             <img src="TheDepths.jpg" alt="作品5">
             <div class="slide-caption">
@@ -743,16 +802,58 @@
     <!-- 图片放大预览框 -->
     <div id="lightbox" class="lightbox">
 
-        <!-- 返回箭头 (与 ABOUT 的 BACK 样式一致) -->
         <button class="lightbox-back" onclick="closeLightbox()">← BACK</button>
 
-        <button class="lightbox-prev" onclick="event.stopPropagation(); previousImage()" aria-label="上一张">
+        <!-- 右上角工具 -->
+        <div class="lightbox-tools">
+
+            <!-- 全屏按钮 -->
+            <button
+                id="fullscreen-btn"
+                class="lightbox-tool"
+                onclick="toggleFullscreen(event)"
+                aria-label="全屏"
+                title="全屏"
+            >
+                <svg id="fullscreen-icon" viewBox="0 0 24 24">
+                    <path d="M8 3H3v5"></path>
+                    <path d="M16 3h5v5"></path>
+                    <path d="M8 21H3v-5"></path>
+                    <path d="M16 21h5v-5"></path>
+                </svg>
+            </button>
+
+            <!-- 下载按钮 -->
+            <button
+                class="lightbox-tool"
+                onclick="downloadCurrentImage(event)"
+                aria-label="下载图片"
+                title="下载图片"
+            >
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12"></path>
+                    <path d="M7 10l5 5 5-5"></path>
+                    <path d="M4 21h16"></path>
+                </svg>
+            </button>
+
+        </div>
+
+        <button
+            class="lightbox-prev"
+            onclick="event.stopPropagation(); previousImage()"
+            aria-label="上一张"
+        >
             ‹
         </button>
 
         <img id="lightbox-img" src="" alt="Preview">
 
-        <button class="lightbox-next" onclick="event.stopPropagation(); nextImage()" aria-label="下一张">
+        <button
+            class="lightbox-next"
+            onclick="event.stopPropagation(); nextImage()"
+            aria-label="下一张"
+        >
             ›
         </button>
 
@@ -835,20 +936,43 @@
         let currentImageIndex = 0;
 
         /*
-         * 图片放大状态
-         *
-         * imageScale：
-         * 当前图片相对于原始像素尺寸的显示比例。
-         *
-         * imageX / imageY：
-         * 图片左上角相对于浏览器窗口左上角的位置。
+         * 当前图片状态
          */
         let imageScale = 1;
+        let defaultScale = 1;
+
         let imageX = 0;
         let imageY = 0;
 
+        let defaultX = 0;
+        let defaultY = 0;
+
+        /*
+         * 平滑动画
+         */
+        let animationFrame = null;
+
+        /*
+         * 当前是否处于放大状态
+         */
+        let isZoomed = false;
+
+        /*
+         * 缩放参数
+         */
         const MAX_ZOOM = 5;
-        const ZOOM_STEP = 1.25;
+        const CLICK_ZOOM = 1.6;
+        const WHEEL_ZOOM_IN = 1.18;
+
+        /*
+         * 拖动状态
+         */
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let dragImageStartX = 0;
+        let dragImageStartY = 0;
+
 
         function openLightbox(element) {
             currentImageIndex = galleryItems.indexOf(element);
@@ -858,6 +982,7 @@
 
             showImage(currentImageIndex);
         }
+
 
         function showImage(index) {
             if (index < 0) {
@@ -879,25 +1004,22 @@
             lightboxImg.src = img.src;
             lightboxImg.alt = img.alt;
 
-            /*
-             * 如果图片已经缓存，onload 可能已经完成，
-             * 因此这里也主动检查一次。
-             */
             if (lightboxImg.complete) {
                 resetImageView();
             }
         }
 
+
         /*
-         * 初始显示规则：
+         * 计算默认视角
          *
-         * 1. 如果原图尺寸小于屏幕可显示区域：
-         *    保持 100%，也就是点对点显示。
+         * 图片小于屏幕：
+         *     100% 点对点
          *
-         * 2. 如果原图尺寸大于屏幕可显示区域：
-         *    缩小到刚好完整显示。
+         * 图片大于屏幕：
+         *     缩小到完整显示
          */
-        function resetImageView() {
+        function calculateDefaultView() {
             if (!lightboxImg.naturalWidth || !lightboxImg.naturalHeight) {
                 return;
             }
@@ -913,175 +1035,699 @@
                 availableHeight / lightboxImg.naturalHeight
             );
 
-            imageScale = Math.min(1, fitScale);
+            /*
+             * 默认最大不会超过100%。
+             */
+            defaultScale = Math.min(1, fitScale);
 
-            const displayWidth = lightboxImg.naturalWidth * imageScale;
-            const displayHeight = lightboxImg.naturalHeight * imageScale;
+            const displayWidth =
+                lightboxImg.naturalWidth * defaultScale;
 
-            imageX = (viewportWidth - displayWidth) / 2;
-            imageY = (viewportHeight - displayHeight) / 2;
+            const displayHeight =
+                lightboxImg.naturalHeight * defaultScale;
 
-            updateImageTransform();
+            defaultX =
+                (viewportWidth - displayWidth) / 2;
+
+            defaultY =
+                (viewportHeight - displayHeight) / 2;
         }
+
+
+        /*
+         * 平滑移动到指定状态
+         */
+        function animateTo(targetScale, targetX, targetY, duration = 260) {
+
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+
+            const startScale = imageScale;
+            const startX = imageX;
+            const startY = imageY;
+
+            const startTime = performance.now();
+
+            function animate(currentTime) {
+
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                /*
+                 * ease-out：
+                 * 开始较快，接近目标时平滑减速。
+                 */
+                const eased =
+                    1 - Math.pow(1 - progress, 3);
+
+                imageScale =
+                    startScale +
+                    (targetScale - startScale) * eased;
+
+                imageX =
+                    startX +
+                    (targetX - startX) * eased;
+
+                imageY =
+                    startY +
+                    (targetY - startY) * eased;
+
+                updateImageTransform();
+
+                if (progress < 1) {
+                    animationFrame =
+                        requestAnimationFrame(animate);
+                } else {
+                    animationFrame = null;
+
+                    imageScale = targetScale;
+                    imageX = targetX;
+                    imageY = targetY;
+
+                    updateImageTransform();
+                }
+            }
+
+            animationFrame =
+                requestAnimationFrame(animate);
+        }
+
 
         function updateImageTransform() {
             lightboxImg.style.transform =
                 `translate(${imageX}px, ${imageY}px) scale(${imageScale})`;
         }
 
+
         /*
-         * 以鼠标所在位置为中心进行缩放。
+         * 恢复默认视角
          *
-         * 这样无论滚轮还是鼠标点击缩放，
-         * 鼠标指向的画面内容都会保持在鼠标位置。
+         * 注意：
+         * 缩小时不仅倍率恢复，
+         * 图片的位置也一起恢复到默认中心位置。
          */
-        function zoomAt(clientX, clientY, zoomFactor) {
+        function resetImageView(animated = false) {
+
+            calculateDefaultView();
+
+            isZoomed = false;
+
+            lightbox.classList.remove('zoomed');
+            lightbox.classList.remove('dragging');
+
+            if (animated) {
+                animateTo(
+                    defaultScale,
+                    defaultX,
+                    defaultY,
+                    280
+                );
+            } else {
+                imageScale = defaultScale;
+                imageX = defaultX;
+                imageY = defaultY;
+
+                updateImageTransform();
+            }
+        }
+
+
+        /*
+         * 判断当前是不是默认视角
+         */
+        function isAtDefaultView() {
+            return Math.abs(imageScale - defaultScale) < 0.001;
+        }
+
+
+        /*
+         * 以鼠标位置为中心进行平滑缩放。
+         */
+        function smoothZoomAt(
+            clientX,
+            clientY,
+            targetScale
+        ) {
+
             if (!lightboxImg.naturalWidth) return;
 
-            const oldScale = imageScale;
-            let newScale = oldScale * zoomFactor;
+            /*
+             * 绝对不能缩小到默认视角以下。
+             */
+            targetScale =
+                Math.max(defaultScale, targetScale);
 
-            newScale = Math.max(0.05, Math.min(MAX_ZOOM, newScale));
+            targetScale =
+                Math.min(MAX_ZOOM, targetScale);
 
-            if (newScale === oldScale) {
+            /*
+             * 如果已经是默认视角，并且要求继续缩小，
+             * 直接恢复默认位置。
+             */
+            if (
+                targetScale <= defaultScale + 0.0001
+            ) {
+                resetImageView(true);
                 return;
             }
 
-            /*
-             * 找到鼠标位置对应的原图坐标。
-             */
-            const imagePointX = (clientX - imageX) / oldScale;
-            const imagePointY = (clientY - imageY) / oldScale;
+            const currentScale = imageScale;
 
             /*
-             * 新缩放比例下，让同一个原图坐标
-             * 仍然落在鼠标位置。
+             * 当前鼠标对应的原图坐标。
              */
-            imageScale = newScale;
+            const imagePointX =
+                (clientX - imageX) / currentScale;
 
-            imageX = clientX - imagePointX * newScale;
-            imageY = clientY - imagePointY * newScale;
+            const imagePointY =
+                (clientY - imageY) / currentScale;
 
-            updateImageTransform();
+            /*
+             * 新倍率下，让同一个原图点
+             * 仍然位于鼠标当前位置。
+             */
+            const targetX =
+                clientX -
+                imagePointX * targetScale;
+
+            const targetY =
+                clientY -
+                imagePointY * targetScale;
+
+            isZoomed = true;
+
+            lightbox.classList.add('zoomed');
+
+            animateTo(
+                targetScale,
+                targetX,
+                targetY,
+                220
+            );
         }
 
-        /*
-         * 鼠标滚轮缩放
-         */
-        lightboxImg.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
 
-            if (e.deltaY < 0) {
-                zoomAt(e.clientX, e.clientY, ZOOM_STEP);
-            } else {
-                zoomAt(e.clientX, e.clientY, 1 / ZOOM_STEP);
+        /*
+         * 鼠标滚轮
+         *
+         * 向上：
+         *     平滑放大，以鼠标为中心
+         *
+         * 向下：
+         *     平滑缩小，以鼠标为中心
+         *
+         * 到达默认倍率后：
+         *     自动恢复默认位置
+         */
+        lightboxImg.addEventListener(
+            'wheel',
+            (e) => {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (e.deltaY < 0) {
+
+                    /*
+                     * 放大
+                     */
+                    const targetScale =
+                        imageScale * WHEEL_ZOOM_IN;
+
+                    smoothZoomAt(
+                        e.clientX,
+                        e.clientY,
+                        targetScale
+                    );
+
+                } else {
+
+                    /*
+                     * 缩小
+                     */
+                    const targetScale =
+                        imageScale / WHEEL_ZOOM_IN;
+
+                    if (
+                        targetScale <=
+                        defaultScale + 0.001
+                    ) {
+                        resetImageView(true);
+                    } else {
+                        smoothZoomAt(
+                            e.clientX,
+                            e.clientY,
+                            targetScale
+                        );
+                    }
+                }
+
+            },
+            { passive: false }
+        );
+
+
+        /*
+         * 默认状态：
+         * 左键点击 → 以点击位置为中心放大
+         *
+         * 已经放大：
+         * 左键单击 → 恢复默认视角
+         */
+        lightboxImg.addEventListener(
+            'click',
+            (e) => {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (isDragging) {
+                    return;
+                }
+
+                /*
+                 * 默认视角 → 放大
+                 */
+                if (!isZoomed || isAtDefaultView()) {
+
+                    const targetScale =
+                        Math.min(
+                            MAX_ZOOM,
+                            defaultScale * CLICK_ZOOM
+                        );
+
+                    smoothZoomAt(
+                        e.clientX,
+                        e.clientY,
+                        targetScale
+                    );
+
+                    return;
+                }
+
+                /*
+                 * 已经放大 → 恢复默认视角
+                 */
+                resetImageView(true);
             }
-        }, { passive: false });
+        );
+
 
         /*
-         * 鼠标左键点击缩放。
-         *
-         * 每次点击：
-         * 放大 1.25 倍。
-         *
-         * 当达到最大倍率后，再点击不会继续放大。
+         * 开始拖动
          */
-        lightboxImg.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+        lightboxImg.addEventListener(
+            'mousedown',
+            (e) => {
 
-            zoomAt(e.clientX, e.clientY, ZOOM_STEP);
-        });
+                /*
+                 * 只处理左键
+                 */
+                if (e.button !== 0) return;
+
+                /*
+                 * 默认视角不能拖动。
+                 */
+                if (!isZoomed || isAtDefaultView()) {
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                isDragging = true;
+
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+
+                dragImageStartX = imageX;
+                dragImageStartY = imageY;
+
+                lightbox.classList.add('dragging');
+            }
+        );
+
 
         /*
-         * 双击时不额外触发浏览器默认行为。
+         * 拖动图片
          */
-        lightboxImg.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
+        document.addEventListener(
+            'mousemove',
+            (e) => {
+
+                if (!isDragging) return;
+
+                e.preventDefault();
+
+                const deltaX =
+                    e.clientX - dragStartX;
+
+                const deltaY =
+                    e.clientY - dragStartY;
+
+                imageX =
+                    dragImageStartX + deltaX;
+
+                imageY =
+                    dragImageStartY + deltaY;
+
+                updateImageTransform();
+            }
+        );
+
 
         /*
-         * 窗口大小改变时重新计算初始显示比例。
-         * 只有在没有进行缩放操作时才自动重置。
+         * 结束拖动
          */
-        window.addEventListener('resize', () => {
-            if (!lightbox.classList.contains('active')) return;
+        document.addEventListener(
+            'mouseup',
+            () => {
 
-            resetImageView();
-        });
+                if (!isDragging) return;
+
+                isDragging = false;
+
+                lightbox.classList.remove('dragging');
+            }
+        );
+
+
+        /*
+         * 防止双击触发浏览器默认选择/放大行为。
+         */
+        lightboxImg.addEventListener(
+            'dblclick',
+            (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        );
+
+
+        /*
+         * 窗口大小改变
+         */
+        window.addEventListener(
+            'resize',
+            () => {
+
+                if (
+                    !lightbox.classList.contains('active')
+                ) {
+                    return;
+                }
+
+                /*
+                 * 窗口变化时重新计算默认视角。
+                 */
+                resetImageView(false);
+            }
+        );
+
 
         function nextImage() {
             showImage(currentImageIndex + 1);
         }
 
+
         function previousImage() {
             showImage(currentImageIndex - 1);
         }
 
+
         function closeLightbox() {
+
             lightbox.classList.remove('active');
+            lightbox.classList.remove('zoomed');
+            lightbox.classList.remove('dragging');
+
+            isDragging = false;
+            isZoomed = false;
+
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+
             document.body.style.overflow = 'auto';
+
+            /*
+             * 如果当前处于浏览器全屏，
+             * 关闭图片窗口时一起退出全屏。
+             */
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
         }
 
-        // 点击黑色背景不再关闭
-        // lightbox.addEventListener('click', (e) => {
-        //     if (e.target === lightbox) {
-        //         closeLightbox();
-        //     }
-        // });
 
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
+        /* --- 全屏功能 --- */
 
-            if (e.key === 'Escape') {
-                closeLightbox();
+        async function toggleFullscreen(e) {
+
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
             }
 
-            if (e.key === 'ArrowRight') {
-                nextImage();
+            try {
+
+                if (!document.fullscreenElement) {
+
+                    await lightbox.requestFullscreen();
+
+                } else {
+
+                    await document.exitFullscreen();
+
+                }
+
+            } catch (error) {
+                console.log(
+                    'Fullscreen error:',
+                    error
+                );
+            }
+        }
+
+
+        /*
+         * 全屏状态变化后，
+         * 重新计算图片默认位置。
+         */
+        document.addEventListener(
+            'fullscreenchange',
+            () => {
+
+                if (!lightbox.classList.contains('active')) {
+                    return;
+                }
+
+                setTimeout(() => {
+                    resetImageView(false);
+                }, 50);
+            }
+        );
+
+
+        /*
+         * 更新全屏按钮图标
+         */
+        document.addEventListener(
+            'fullscreenchange',
+            () => {
+
+                const icon =
+                    document.getElementById(
+                        'fullscreen-icon'
+                    );
+
+                if (!icon) return;
+
+                if (document.fullscreenElement) {
+
+                    icon.innerHTML = `
+                        <path d="M9 3H3v6"></path>
+                        <path d="M15 3h6v6"></path>
+                        <path d="M9 21H3v-6"></path>
+                        <path d="M15 21h6v-6"></path>
+                    `;
+
+                } else {
+
+                    icon.innerHTML = `
+                        <path d="M8 3H3v5"></path>
+                        <path d="M16 3h5v5"></path>
+                        <path d="M8 21H3v-5"></path>
+                        <path d="M16 21h5v-5"></path>
+                    `;
+                }
+            }
+        );
+
+
+        /* --- 下载当前图片 --- */
+
+        function downloadCurrentImage(e) {
+
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
             }
 
-            if (e.key === 'ArrowLeft') {
-                previousImage();
+            const currentItem =
+                galleryItems[currentImageIndex];
+
+            if (!currentItem) return;
+
+            const img =
+                currentItem.querySelector('img');
+
+            if (!img) return;
+
+            /*
+             * 创建临时下载链接。
+             *
+             * 下载的是原始图片文件，
+             * 不是屏幕上经过缩放后的版本。
+             */
+            const link =
+                document.createElement('a');
+
+            link.href = img.src;
+
+            /*
+             * 根据图片文件名生成下载名称。
+             */
+            const sourceName =
+                img.src
+                    .split('/')
+                    .pop()
+                    .split('?')[0];
+
+            link.download =
+                sourceName || 'T.J.ART.jpg';
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+        }
+
+
+        /* --- 键盘操作 --- */
+
+        document.addEventListener(
+            'keydown',
+            (e) => {
+
+                if (
+                    !lightbox.classList.contains('active')
+                ) {
+                    return;
+                }
+
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                }
+
+                if (e.key === 'ArrowRight') {
+                    nextImage();
+                }
+
+                if (e.key === 'ArrowLeft') {
+                    previousImage();
+                }
             }
-        });
+        );
 
 
         /* --- 4. ABOUT 页面逻辑 --- */
-        const aboutLink = document.getElementById('about-link');
-        const aboutOverlay = document.getElementById('about-overlay');
-        const aboutBack = document.getElementById('about-back');
+        const aboutLink =
+            document.getElementById('about-link');
+
+        const aboutOverlay =
+            document.getElementById('about-overlay');
+
+        const aboutBack =
+            document.getElementById('about-back');
 
         let savedScrollPosition = 0;
 
-        function openAbout(e) {
-            if (e) e.preventDefault();
 
-            savedScrollPosition = window.scrollY;
+        function openAbout(e) {
+
+            if (e) {
+                e.preventDefault();
+            }
+
+            savedScrollPosition =
+                window.scrollY;
 
             aboutOverlay.classList.add('active');
-            aboutOverlay.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('about-open');
+
+            aboutOverlay.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.body.classList.add(
+                'about-open'
+            );
         }
+
 
         function closeAbout() {
-            aboutOverlay.classList.remove('active');
-            aboutOverlay.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('about-open');
 
-            window.scrollTo(0, savedScrollPosition);
+            aboutOverlay.classList.remove(
+                'active'
+            );
+
+            aboutOverlay.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            document.body.classList.remove(
+                'about-open'
+            );
+
+            window.scrollTo(
+                0,
+                savedScrollPosition
+            );
         }
 
-        aboutLink.addEventListener('click', openAbout);
-        aboutBack.addEventListener('click', closeAbout);
 
-        document.addEventListener('keydown', (e) => {
-            if (aboutOverlay.classList.contains('active') && e.key === 'Escape') {
-                closeAbout();
+        aboutLink.addEventListener(
+            'click',
+            openAbout
+        );
+
+        aboutBack.addEventListener(
+            'click',
+            closeAbout
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            (e) => {
+
+                if (
+                    aboutOverlay.classList.contains(
+                        'active'
+                    ) &&
+                    e.key === 'Escape'
+                ) {
+                    closeAbout();
+                }
+
             }
-        });
+        );
+
     </script>
 
 </body>
