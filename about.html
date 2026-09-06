@@ -62,14 +62,15 @@
             letter-spacing: 1px;
         }
 
-        /* --- 3. 手机端适配 --- */
-        @media (max-width: 768px) {
+                .back-link { position: fixed; top: 25px; left: 50px; z-index: 100; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #fff; transition: opacity 0.3s ease; }         .back-link:hover { opacity: 0.7; }
+/* --- 3. 手机端适配 --- */
+        @media (max-width: 768px) { .back-link { top: 20px; left: 25px; font-size: 11px; }
             .about-container { padding: 30px 20px; }
             .about-text { font-size: 15px; }
         }
     </style>
 </head>
-<body>
+<body> <a href="index.html" class="back-link">&larr; Back</a>
     <!-- 关于内容 -->
     <div class="about-container">
         <div class="about-text">
