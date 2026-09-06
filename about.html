@@ -22,7 +22,19 @@
         a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
         a:hover { opacity: 0.7; }
 
-        /* --- 2. 关于页面内容 --- */
+        /* --- 2. 左上角返回键 --- */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 40px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            z-index: 100;
+        }
+
+        /* --- 3. 关于页面内容 --- */
         .about-container {
             max-width: 600px;
             text-align: center;
@@ -53,25 +65,26 @@
         .signature p {
             margin: 5px 0;
         }
-        .email {
-            color: #fff;
-            font-style: normal;
+        .email-text {
             display: block;
             margin-top: 10px;
             font-size: 13px;
             letter-spacing: 1px;
+            color: #aaa;
         }
 
-                .back-link { position: fixed; top: 25px; left: 50px; z-index: 100; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #fff; transition: opacity 0.3s ease; }         .back-link:hover { opacity: 0.7; }
-/* --- 3. 手机端适配 --- */
-        @media (max-width: 768px) { .back-link { top: 20px; left: 25px; font-size: 11px; }
+        /* --- 4. 手机端适配 --- */
+        @media (max-width: 768px) {
+            .back-link { top: 20px; left: 25px; font-size: 11px; }
             .about-container { padding: 30px 20px; }
             .about-text { font-size: 15px; }
         }
     </style>
 </head>
-<body> <a href="index.html" class="back-link">&larr; Back</a>
-    <!-- 关于内容 -->
+<body>
+    <!-- 返回主页，浏览器会自动恢复之前的滚动位置 -->
+    <a href="index.html" class="back-link">← BACK</a>
+
     <div class="about-container">
         <div class="about-text">
             <p>你好，我是一名摄影爱好者，也是一名在读的博士研究生。我通过这个网站向你分享作品，并讲述作品背后的故事。</p>
@@ -80,7 +93,7 @@
         </div>
         <div class="signature">
             <p>T. J. Wan</p>
-            <a href="mailto:wantianjian@163.com" class="email">wantianjian@163.com</a>
+            <span class="email-text">wantianjian@163.com</span>
             <p>Sep, 2026.</p>
         </div>
     </div>
