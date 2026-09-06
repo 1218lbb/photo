@@ -113,12 +113,18 @@
 
         /* ============================================================
            3. 首页幻灯片
+           
+           宽画面：
+           整个滚动区域直接充满浏览器高度。
+           
+           图片使用 contain，
+           保证完整显示，不再因为 cover 而被上下裁剪。
            ============================================================ */
 
         .hero-slideshow {
             position: relative;
             width: 100%;
-            height: 85vh;
+            height: 100vh;
             overflow: hidden;
             background: #000;
         }
@@ -140,10 +146,13 @@
             justify-content: center;
 
             background: #000;
+
+            pointer-events: none;
         }
 
         .slide.active {
             opacity: 1;
+            pointer-events: auto;
         }
 
         .slide img {
@@ -153,7 +162,7 @@
             width: 100%;
             height: 100%;
 
-            object-fit: cover;
+            object-fit: contain;
             object-position: center center;
 
             display: block;
@@ -173,6 +182,7 @@
             background: linear-gradient(
                 to top,
                 rgba(0,0,0,0.85) 0%,
+                rgba(0,0,0,0.45) 35%,
                 transparent 100%
             );
 
@@ -226,9 +236,14 @@
         /* ============================================================
            4. 窄屏首页幻灯片
            
-           只修复窄屏轮播时页面上下跳跃的问题：
-           hero 高度固定为所有轮播图片中最高的一张，
-           每一张图片仍然按照自身比例显示。
+           图片保持自身比例，不裁剪。
+           
+           所有 slide 始终存在于画面中，
+           只通过 opacity 做淡入淡出，
+           因此窄画面也可以正常播放动画。
+           
+           hero 高度由 JS 固定为所有图片中最高的高度，
+           防止 Selected Works 上下跳动。
            ============================================================ */
 
         @media (max-aspect-ratio: 1.4/1) {
@@ -240,38 +255,46 @@
 
             .slide {
                 position: absolute;
+
                 top: 0;
                 left: 0;
                 right: 0;
-                inset: auto;
 
                 width: 100%;
                 height: var(--slide-height, 0px);
 
                 min-height: 0;
 
-                display: none;
+                display: block;
 
                 opacity: 0;
 
-                align-items: unset;
-                justify-content: unset;
-
                 background: #000;
+
+                pointer-events: none;
+
+                transition:
+                    opacity 1.5s cubic-bezier(
+                        0.4,
+                        0,
+                        0.2,
+                        1
+                    );
             }
 
             .slide.active {
                 display: block;
                 opacity: 1;
+                pointer-events: auto;
             }
 
             .slide img {
                 position: absolute;
+
                 top: 0;
                 left: 0;
                 right: auto;
                 bottom: auto;
-                inset: auto;
 
                 display: block;
 
@@ -285,6 +308,14 @@
                 object-position: top center;
             }
 
+            /*
+             * 渐隐层直接覆盖整个图片的底部区域。
+             *
+             * 因为 slide 的高度已经由 JS
+             * 设置成当前图片的真实显示高度，
+             * 所以渐隐不会跑到图片外面。
+             */
+
             .slide::after {
                 position: absolute;
 
@@ -293,21 +324,24 @@
                 left: 0;
                 right: 0;
 
-                height: 38%;
+                height: 42%;
 
                 background: linear-gradient(
                     to top,
-                    rgba(0,0,0,0.88) 0%,
-                    rgba(0,0,0,0.45) 45%,
+                    rgba(0,0,0,0.90) 0%,
+                    rgba(0,0,0,0.68) 20%,
+                    rgba(0,0,0,0.38) 48%,
+                    rgba(0,0,0,0.08) 78%,
                     transparent 100%
                 );
 
                 z-index: 1;
+
+                pointer-events: none;
             }
 
             /*
-             * caption 不再依靠固定 top 值。
-             * 它始终以当前图片的底部为参照。
+             * caption 始终贴在图片底部。
              */
 
             .slide-caption {
@@ -900,7 +934,8 @@
             }
 
             /*
-             * 窄屏轮播高度由上面的固定高度机制控制。
+             * 窄屏下保持 JS 计算出来的固定高度，
+             * 避免幻灯片切换时页面上下跳动。
              */
 
             .hero-slideshow {
@@ -1557,13 +1592,13 @@
 
 
     /* ============================================================
-       窄屏轮播高度固定
+       窄屏幻灯片高度
        
-       只用于解决：
-       不同图片比例导致 hero 高度变化，
-       从而使下面页面上下跳跃的问题。
+       计算所有首页图片的实际显示高度，
+       取最高值作为整个 hero 的固定高度。
        
-       每张图片仍然按照自己的原始比例显示。
+       每一张 slide 自己仍然保持对应图片的真实高度，
+       因此渐隐和 caption 都严格位于图片内部。
        ============================================================ */
 
     function fixNarrowHeroHeight() {
@@ -1573,6 +1608,13 @@
                 '.hero-slideshow'
             );
 
+        const heroImages =
+            Array.from(
+                document.querySelectorAll(
+                    '.hero-slideshow .slide img'
+                )
+            );
+
         const heroSlides =
             Array.from(
                 document.querySelectorAll(
@@ -1580,22 +1622,19 @@
                 )
             );
 
-        const heroImages =
-            heroSlides.map(
-                slide =>
-                    slide.querySelector('img')
-            );
-
-
         if (
             !hero ||
-            !heroSlides.length ||
             !heroImages.length
         ) {
-
             return;
         }
 
+
+        /*
+         * 宽画面：
+         *
+         * 清除窄画面专用高度。
+         */
 
         if (
             !window.matchMedia(
@@ -1607,12 +1646,15 @@
                 '--hero-fixed-height'
             );
 
-
             heroSlides.forEach(
-                slide => {
+                (slide) => {
 
                     slide.style.removeProperty(
                         '--slide-height'
+                    );
+
+                    slide.style.removeProperty(
+                        'height'
                     );
 
                 }
@@ -1625,11 +1667,9 @@
         const viewportWidth =
             hero.clientWidth;
 
-
         if (
-            viewportWidth <= 0
+            !viewportWidth
         ) {
-
             return;
         }
 
@@ -1641,17 +1681,32 @@
             (img, index) => {
 
                 if (
-                    img.naturalWidth &&
-                    img.naturalHeight
+                    !img.naturalWidth ||
+                    !img.naturalHeight
                 ) {
 
-                    const imageHeight =
-                        viewportWidth *
-                        (
-                            img.naturalHeight /
-                            img.naturalWidth
-                        );
+                    return;
+                }
 
+
+                const imageHeight =
+                    viewportWidth *
+                    (
+                        img.naturalHeight /
+                        img.naturalWidth
+                    );
+
+
+                maxHeight =
+                    Math.max(
+                        maxHeight,
+                        imageHeight
+                    );
+
+
+                if (
+                    heroSlides[index]
+                ) {
 
                     heroSlides[index]
                         .style
@@ -1660,13 +1715,10 @@
                             `${imageHeight}px`
                         );
 
-
-                    maxHeight =
-                        Math.max(
-                            maxHeight,
-                            imageHeight
-                        );
-
+                    heroSlides[index]
+                        .style
+                        .height =
+                        `${imageHeight}px`;
                 }
 
             }
@@ -1685,47 +1737,24 @@
     }
 
 
-    /*
-     * 图片加载完成后计算。
-     */
+    fixNarrowHeroHeight();
+
 
     document
         .querySelectorAll(
-            '.hero-slideshow img'
+            '.hero-slideshow .slide img'
         )
         .forEach(
-            img => {
+            (img) => {
 
-                if (
-                    img.complete
-                ) {
-
-                    fixNarrowHeroHeight();
-
-                } else {
-
-                    img.addEventListener(
-                        'load',
-                        fixNarrowHeroHeight
-                    );
-
-                }
+                img.addEventListener(
+                    'load',
+                    fixNarrowHeroHeight
+                );
 
             }
         );
 
-
-    /*
-     * 初始计算。
-     */
-
-    fixNarrowHeroHeight();
-
-
-    /*
-     * 窗口尺寸变化时重新计算，
-     * 防止横竖屏切换或调整浏览器宽度后高度不正确。
-     */
 
     window.addEventListener(
         'resize',
@@ -1939,27 +1968,14 @@
         direction
     ) {
 
-        /*
-         * 删除之前的动画类。
-         */
-
         lightbox.classList.remove(
             'slide-next',
             'slide-prev'
         );
 
 
-        /*
-         * 强制浏览器重新计算，
-         * 确保连续快速切图时动画仍然触发。
-         */
-
         void lightboxImg.offsetWidth;
 
-
-        /*
-         * 当前 transform 位置写入 CSS 变量。
-         */
 
         lightboxImg.style.setProperty(
             '--slide-x',
@@ -1992,10 +2008,6 @@
             );
         }
 
-
-        /*
-         * 动画结束后清除。
-         */
 
         setTimeout(
             () => {
@@ -2062,10 +2074,6 @@
         touchMoved = false;
 
 
-        /*
-         * 取消旧动画。
-         */
-
         if (animationFrame) {
 
             cancelAnimationFrame(
@@ -2096,11 +2104,6 @@
                     false
                 );
 
-
-                /*
-                 * 新图片载入完成以后，
-                 * 再播放左右滑入动画。
-                 */
 
                 if (
                     direction
@@ -2664,7 +2667,9 @@
                 smoothZoomAt(
 
                     e.clientX,
+
                     e.clientY,
+
                     targetScale
                 );
 
