@@ -25,9 +25,9 @@
             z-index: 100;
             transition: background 0.4s ease; /* 添加背景过渡动画 */
         }
-        /* 滚动后添加的渐变背景样式 */
+        /* 滚动后的渐变：顶部淡淡的黑，越往下越透明，底部完全透明 */
         nav.scrolled {
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.7));
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0) 100%);
         }
         .logo { font-size: 20px; font-weight: 600; letter-spacing: 4px; color: #fff; text-transform: uppercase; }
         .nav-links a { margin-left: 40px; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #fff; transition: opacity 0.3s ease; }
@@ -48,7 +48,6 @@
         .gallery-section { padding: 100px 50px; max-width: 1600px; margin: 0 auto; }
         .section-title { font-size: 14px; margin-bottom: 50px; text-align: center; letter-spacing: 4px; color: #666; text-transform: uppercase; }
 
-        /* 核心修改：改回瀑布流布局 */
         .gallery-grid {
             columns: 3;
             column-gap: 15px;
@@ -295,9 +294,7 @@
         // --- 2. 导航栏滚动渐变逻辑 ---
         const nav = document.querySelector('nav');
         const heroSection = document.querySelector('.hero-slideshow');
-        
         window.addEventListener('scroll', () => {
-            // 当页面滚动距离超过幻灯片高度时，添加 'scrolled' 类
             if (window.scrollY > heroSection.offsetHeight - 100) {
                 nav.classList.add('scrolled');
             } else {
