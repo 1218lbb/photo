@@ -13,12 +13,20 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: auto;
+        }
+
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: #000;
             color: #e0e0e0;
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        body.about-open {
+            overflow: hidden;
         }
 
         a {
@@ -77,7 +85,7 @@
             opacity: 0.7;
         }
 
-        /* --- 3. 全屏幻灯片 --- */
+        /* --- 3. 首页全屏幻灯片 --- */
         .hero-slideshow {
             position: relative;
             width: 100%;
@@ -88,8 +96,7 @@
 
         .slide {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             opacity: 0;
@@ -97,6 +104,7 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
+            background: #000;
         }
 
         .slide.active {
@@ -105,14 +113,15 @@
 
         .slide img {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
 
+        /* 宽屏：保持现在的宽幅视觉效果 */
+        /* 窄屏规则见下方：改为 contain，完整显示照片 */
         .slide::before {
             content: '';
             position: absolute;
@@ -122,9 +131,10 @@
             height: 40%;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             z-index: 1;
+            pointer-events: none;
         }
 
-        /* 所有首页幻灯片信息固定在同一个位置 */
+        /* 所有首页图片的信息固定在同一个位置 */
         .slide-caption {
             position: absolute;
             left: 0;
@@ -160,7 +170,18 @@
             line-height: 1.5;
         }
 
-        /* --- 4. 作品网格 --- */
+        /* --- 4. 窄屏时：完整显示图片，不裁掉左右内容 --- */
+        @media (max-aspect-ratio: 1.4/1) {
+            .slide img {
+                object-fit: contain;
+            }
+
+            .slide::before {
+                height: 35%;
+            }
+        }
+
+        /* --- 5. 作品网格 --- */
         .gallery-section {
             padding: 130px 50px 100px;
             max-width: 1600px;
@@ -205,7 +226,7 @@
             filter: brightness(1.1);
         }
 
-        /* 小图悬停信息：标题与拍摄信息明确分成两行 */
+        /* 小图悬停信息 */
         .overlay {
             position: absolute;
             bottom: 0;
@@ -247,7 +268,7 @@
             line-height: 1.5;
         }
 
-        /* --- 5. 图片放大预览 --- */
+        /* --- 6. 图片放大预览 --- */
         .lightbox {
             display: none;
             position: fixed;
@@ -314,7 +335,81 @@
             right: 25px;
         }
 
-        /* --- 6. 页脚 --- */
+        /* --- 7. ABOUT 全屏黑色界面 --- */
+        .about-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .about-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .about-content {
+            width: min(760px, calc(100% - 80px));
+            color: #e0e0e0;
+            text-align: left;
+        }
+
+        .about-content p {
+            margin: 0 0 22px;
+            font-size: 16px;
+            line-height: 2;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .about-content .about-signature {
+            margin-top: 35px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .about-content .about-email,
+        .about-content .about-date {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #888;
+        }
+
+        /* 邮件地址刻意不是超链接 */
+        .about-email {
+            user-select: text;
+        }
+
+        .about-back {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .about-back:hover {
+            opacity: 0.55;
+        }
+
+        /* --- 8. 页脚 --- */
         footer {
             text-align: center;
             padding: 50px;
@@ -326,7 +421,7 @@
             border-top: 1px solid #1a1a1a;
         }
 
-        /* --- 7. 手机端适配 --- */
+        /* --- 9. 手机端适配 --- */
         @media (max-width: 768px) {
             nav {
                 padding: 20px 25px;
@@ -386,6 +481,26 @@
                 right: 20px;
                 font-size: 22px;
             }
+
+            .about-content {
+                width: calc(100% - 50px);
+            }
+
+            .about-content p {
+                font-size: 15px;
+                line-height: 1.9;
+                margin-bottom: 18px;
+            }
+
+            .about-content .about-signature {
+                margin-top: 28px;
+            }
+
+            .about-back {
+                top: 20px;
+                left: 25px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -396,7 +511,7 @@
     <nav>
         <div class="logo">T. J. ART</div>
         <div class="nav-links">
-            <a href="about.html">ABOUT</a>
+            <a href="#" id="about-link">ABOUT</a>
         </div>
     </nav>
 
@@ -580,7 +695,7 @@
         </div>
     </section>
 
-    <!-- 放大预览框 -->
+    <!-- 图片放大预览框 -->
     <div id="lightbox" class="lightbox">
 
         <button class="lightbox-prev" onclick="event.stopPropagation(); previousImage()" aria-label="上一张">
@@ -595,6 +710,42 @@
 
         <span class="close-btn" onclick="closeLightbox()">CLOSE</span>
 
+    </div>
+
+    <!-- ABOUT 全屏黑色界面 -->
+    <div id="about-overlay" class="about-overlay" aria-hidden="true">
+
+        <button id="about-back" class="about-back" aria-label="返回">
+            ← BACK
+        </button>
+
+        <div class="about-content">
+
+            <p>
+                你好，我是一名摄影爱好者，也是一名在读的博士研究生。我通过这个网站向你分享作品，并讲述作品背后的故事。
+            </p>
+
+            <p>
+                我的摄影之旅从2019年开始，如今已经成为了一种生活方式。每当远离城市、走进旷野，随意地开着车，我都感到心旷神怡。我尝试通过镜头表达自己对所及之处的感受，就有了这些图片。
+            </p>
+
+            <p>
+                希望这些图片能带给你一缕旷野的风。
+            </p>
+
+            <p class="about-signature">
+                T. J. Wan
+            </p>
+
+            <p class="about-email">
+                wantianjian@163.com
+            </p>
+
+            <p class="about-date">
+                Sep, 2026.
+            </p>
+
+        </div>
     </div>
 
     <footer>&copy; 2024 T. J. ART. All Rights Reserved.</footer>
@@ -637,7 +788,6 @@
 
         let currentImageIndex = 0;
 
-
         function openLightbox(element) {
             currentImageIndex = galleryItems.indexOf(element);
             showImage(currentImageIndex);
@@ -645,7 +795,6 @@
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
 
         function showImage(index) {
             if (index < 0) {
@@ -664,32 +813,25 @@
             lightboxImg.alt = img.alt;
         }
 
-
         function nextImage() {
             showImage(currentImageIndex + 1);
         }
 
-
         function previousImage() {
             showImage(currentImageIndex - 1);
         }
-
 
         function closeLightbox() {
             lightbox.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
-
-        /* 点击黑色背景关闭 */
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) {
                 closeLightbox();
             }
         });
 
-
-        /* 键盘左右切换 / ESC关闭 */
         document.addEventListener('keydown', (e) => {
             if (!lightbox.classList.contains('active')) return;
 
@@ -703,6 +845,43 @@
 
             if (e.key === 'ArrowLeft') {
                 previousImage();
+            }
+        });
+
+
+        /* --- 4. ABOUT 页面逻辑 --- */
+        const aboutLink = document.getElementById('about-link');
+        const aboutOverlay = document.getElementById('about-overlay');
+        const aboutBack = document.getElementById('about-back');
+
+        /* 保存打开 ABOUT 前的滚动位置 */
+        let savedScrollPosition = 0;
+
+        function openAbout(e) {
+            if (e) e.preventDefault();
+
+            savedScrollPosition = window.scrollY;
+
+            aboutOverlay.classList.add('active');
+            aboutOverlay.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('about-open');
+        }
+
+        function closeAbout() {
+            aboutOverlay.classList.remove('active');
+            aboutOverlay.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('about-open');
+
+            /* 精确返回之前浏览到的位置 */
+            window.scrollTo(0, savedScrollPosition);
+        }
+
+        aboutLink.addEventListener('click', openAbout);
+        aboutBack.addEventListener('click', closeAbout);
+
+        document.addEventListener('keydown', (e) => {
+            if (aboutOverlay.classList.contains('active') && e.key === 'Escape') {
+                closeAbout();
             }
         });
     </script>
