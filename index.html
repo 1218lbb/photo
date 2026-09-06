@@ -1,1409 +1,1020 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>T. J. ART | Photography Portfolio</title>
-
-<style>
-
-/* =========================================================
-   1. GLOBAL
-   ========================================================= */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    margin: 0;
-    padding: 0;
-    scroll-behavior: auto;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family:
-        "Helvetica Neue",
-        Helvetica,
-        Arial,
-        sans-serif;
-
-    background: #000;
-    color: #e0e0e0;
-    line-height: 1.6;
-    overflow-x: hidden;
-}
-
-button {
-    font-family: inherit;
-}
-
-img {
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-
-/* =========================================================
-   2. NAVIGATION
-   ========================================================= */
-
-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-
-    z-index: 1000;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 25px 40px;
-
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,.75),
-        rgba(0,0,0,0)
-    );
-
-    transition: background .4s ease;
-}
-
-.logo {
-    color: #fff;
-    text-decoration: none;
-
-    font-size: 14px;
-    font-weight: 500;
-
-    letter-spacing: 4px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 35px;
-    list-style: none;
-}
-
-.nav-links a {
-    color: #aaa;
-    text-decoration: none;
-
-    font-size: 11px;
-    letter-spacing: 2px;
-
-    transition: color .3s ease;
-}
-
-.nav-links a:hover {
-    color: #fff;
-}
-
-
-/* =========================================================
-   3. HERO SLIDESHOW
-   ========================================================= */
-
-.hero-slideshow {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 85vh;
-
-    overflow: hidden;
-
-    background: #000;
-}
-
-
-/*
-   默认桌面模式
-*/
-.slide {
-
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    opacity: 0;
-
-    transition:
-        opacity 1.5s cubic-bezier(.4,0,.2,1);
-
-    display: flex;
-
-    align-items: flex-end;
-    justify-content: center;
-
-    background: #000;
-
-    overflow: hidden;
-}
-
-.slide.active {
-    opacity: 1;
-}
-
-.slide img {
-
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    object-position: center center;
-
-    display: block;
-}
-
-
-/* 图片底部渐变 */
-
-.slide::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    height: 45%;
-
-    z-index: 1;
-
-    pointer-events: none;
-
-    background:
-        linear-gradient(
-            to top,
-            rgba(0,0,0,.88) 0%,
-            rgba(0,0,0,.55) 30%,
-            rgba(0,0,0,.18) 65%,
-            transparent 100%
-        );
-}
-
-
-/* =========================================================
-   HERO CAPTION
-   ========================================================= */
-
-.slide-caption {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 55px;
-
-    z-index: 2;
-
-    padding: 0 40px;
-
-    text-align: center;
-
-    color: #fff;
-
-    transform: translateY(20px);
-
-    opacity: 0;
-
-    transition:
-        all 1s ease .5s;
-
-    pointer-events: none;
-}
-
-.slide.active .slide-caption {
-
-    transform: translateY(0);
-
-    opacity: 1;
-}
-
-.slide-caption h3 {
-
-    margin-bottom: 5px;
-
-    font-size: 25px;
-
-    font-weight: 300;
-
-    letter-spacing: 4px;
-}
-
-.slide-caption p {
-
-    font-size: 11px;
-
-    color: #bbb;
-
-    letter-spacing: 3px;
-}
-
-
-/* =========================================================
-   4. GALLERY
-   ========================================================= */
-
-.gallery-section {
-
-    position: relative;
-
-    padding: 130px 50px 100px;
-
-    max-width: 1600px;
-
-    margin: 0 auto;
-}
-
-.section-title {
-
-    font-size: 14px;
-
-    margin-bottom: 50px;
-
-    text-align: center;
-
-    letter-spacing: 4px;
-
-    color: #666;
-
-    text-transform: uppercase;
-}
-
-
-/*
-   Masonry
-*/
-
-.gallery-grid {
-
-    columns: 3;
-
-    column-gap: 15px;
-}
-
-.gallery-item {
-
-    position: relative;
-
-    display: inline-block;
-
-    width: 100%;
-
-    margin-bottom: 15px;
-
-    overflow: hidden;
-
-    background: #080808;
-
-    cursor: pointer;
-
-    break-inside: avoid;
-}
-
-.gallery-item img {
-
-    width: 100%;
-
-    height: auto;
-
-    display: block;
-
-    transition:
-        transform .8s cubic-bezier(.2,.8,.2,1),
-        opacity .5s ease;
-}
-
-.gallery-item:hover img {
-
-    transform: scale(1.025);
-
-    opacity: .82;
-}
-
-.gallery-info {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    padding: 50px 20px 18px;
-
-    background:
-        linear-gradient(
-            to top,
-            rgba(0,0,0,.82),
-            transparent
-        );
-
-    opacity: 0;
-
-    transform: translateY(10px);
-
-    transition:
-        opacity .4s ease,
-        transform .4s ease;
-
-    pointer-events: none;
-}
-
-.gallery-item:hover .gallery-info {
-
-    opacity: 1;
-
-    transform: translateY(0);
-}
-
-.gallery-info h3 {
-
-    font-size: 14px;
-
-    font-weight: 400;
-
-    letter-spacing: 2px;
-}
-
-.gallery-info p {
-
-    margin-top: 3px;
-
-    font-size: 10px;
-
-    color: #aaa;
-
-    letter-spacing: 1px;
-}
-
-
-/* =========================================================
-   5. ABOUT
-   ========================================================= */
-
-.about-overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 2000;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 40px;
-
-    background: rgba(0,0,0,.96);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity .45s ease,
-        visibility .45s ease;
-}
-
-.about-overlay.open {
-
-    opacity: 1;
-
-    visibility: visible;
-}
-
-.about-content {
-
-    width: min(700px, 100%);
-
-    text-align: center;
-}
-
-.about-content h2 {
-
-    margin-bottom: 35px;
-
-    font-size: 25px;
-
-    font-weight: 300;
-
-    letter-spacing: 6px;
-}
-
-.about-content p {
-
-    margin-bottom: 20px;
-
-    color: #aaa;
-
-    font-size: 13px;
-
-    line-height: 2;
-
-    letter-spacing: 1px;
-}
-
-.about-close {
-
-    position: absolute;
-
-    top: 30px;
-    right: 35px;
-
-    width: 40px;
-    height: 40px;
-
-    border: none;
-
-    background: transparent;
-
-    color: #aaa;
-
-    font-size: 28px;
-
-    cursor: pointer;
-
-    transition: color .3s ease;
-}
-
-.about-close:hover {
-    color: #fff;
-}
-
-
-/* =========================================================
-   6. LIGHTBOX
-   ========================================================= */
-
-.lightbox {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 3000;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0,0,0,.97);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity .4s ease,
-        visibility .4s ease;
-
-    overflow: hidden;
-}
-
-.lightbox.open {
-
-    opacity: 1;
-
-    visibility: visible;
-}
-
-
-/*
-   图片显示区域
-*/
-
-.lightbox-stage {
-
-    position: absolute;
-
-    inset: 0;
-
-    overflow: hidden;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    touch-action: none;
-
-    cursor: zoom-in;
-}
-
-#lightbox-img {
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    max-width: none;
-    max-height: none;
-
-    width: auto;
-    height: auto;
-
-    transform-origin: center center;
-
-    user-select: none;
-
-    -webkit-user-drag: none;
-
-    will-change: transform;
-
-    touch-action: none;
-
-    cursor: zoom-in;
-}
-
-
-/* =========================================================
-   LIGHTBOX BUTTONS
-   ========================================================= */
-
-.lightbox-top-buttons {
-
-    position: absolute;
-
-    top: 25px;
-    right: 25px;
-
-    z-index: 20;
-
-    display: flex;
-
-    gap: 8px;
-}
-
-.lightbox-btn {
-
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(255,255,255,.25);
-
-    border-radius: 50%;
-
-    background: rgba(0,0,0,.35);
-
-    color: #fff;
-
-    font-size: 16px;
-
-    cursor: pointer;
-
-    transition:
-        background .3s ease,
-        border-color .3s ease;
-}
-
-.lightbox-btn:hover {
-
-    background: rgba(255,255,255,.15);
-
-    border-color: rgba(255,255,255,.65);
-}
-
-
-/* =========================================================
-   LIGHTBOX CLOSE
-   ========================================================= */
-
-.lightbox-close {
-
-    position: absolute;
-
-    top: 25px;
-    left: 25px;
-
-    z-index: 20;
-
-    width: 42px;
-    height: 42px;
-
-    border: 1px solid rgba(255,255,255,.25);
-
-    border-radius: 50%;
-
-    background: rgba(0,0,0,.35);
-
-    color: #fff;
-
-    font-size: 25px;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background .3s ease,
-        border-color .3s ease;
-}
-
-.lightbox-close:hover {
-
-    background: rgba(255,255,255,.15);
-
-    border-color: rgba(255,255,255,.65);
-}
-
-
-/* =========================================================
-   LIGHTBOX NAVIGATION
-   ========================================================= */
-
-.lightbox-arrow {
-
-    position: absolute;
-
-    top: 50%;
-
-    z-index: 20;
-
-    width: 55px;
-    height: 70px;
-
-    margin-top: -35px;
-
-    border: none;
-
-    background: rgba(0,0,0,.15);
-
-    color: rgba(255,255,255,.7);
-
-    font-size: 35px;
-
-    cursor: pointer;
-
-    transition:
-        color .3s ease,
-        background .3s ease;
-}
-
-.lightbox-arrow:hover {
-
-    color: #fff;
-
-    background: rgba(0,0,0,.45);
-}
-
-.lightbox-prev {
-    left: 15px;
-}
-
-.lightbox-next {
-    right: 15px;
-}
-
-
-/* =========================================================
-   IMAGE INFO
-   ========================================================= */
-
-.lightbox-caption {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 25px;
-
-    z-index: 20;
-
-    text-align: center;
-
-    pointer-events: none;
-
-    text-shadow:
-        0 1px 8px rgba(0,0,0,.8);
-}
-
-.lightbox-caption h3 {
-
-    font-size: 13px;
-
-    font-weight: 400;
-
-    letter-spacing: 3px;
-}
-
-.lightbox-caption p {
-
-    margin-top: 2px;
-
-    font-size: 10px;
-
-    color: #aaa;
-
-    letter-spacing: 2px;
-}
-
-
-/* =========================================================
-   7. FOOTER
-   ========================================================= */
-
-footer {
-
-    padding: 40px 20px 50px;
-
-    text-align: center;
-
-    color: #444;
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-}
-
-
-/* =========================================================
-   8. NARROW SCREEN
-   =========================================================
-
-   这里是本次修复的核心。
-
-   以前：
-
-       hero height:auto
-       slide height:auto
-       当前图片换了以后，hero高度跟着变化
-
-   于是：
-
-       Selected Works
-       ↓
-       ↓
-       ↓
-       一起上下移动
-
-   现在：
-
-       hero 高度由 JS 固定为所有轮播图片中
-       在当前屏幕宽度下的最大实际高度。
-
-   当前图片依然可以保持原始比例、从顶部开始。
-   但 hero 自己的总高度不再变化。
-*/
-
-@media (max-aspect-ratio: 1.4/1) {
-
-    .hero-slideshow {
-
-        /*
-           JS 会动态设置：
-
-           --hero-slideshow-height
-
-           没有 JS 时暂时 auto，
-           JS 加载后立即锁定。
-        */
-
-        height:
-            var(
-                --hero-slideshow-height,
-                auto
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T. J. ART | Photography Portfolio</title>
+
+    <style>
+
+        #lightbox-img {
+            touch-action: none;
+        }
+
+
+        /* ============================================================
+           1. 全局
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family:
+                'Helvetica Neue',
+                Helvetica,
+                Arial,
+                sans-serif;
+            background-color: #000;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body.about-open {
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: opacity 0.3s ease;
+        }
+
+        a:hover {
+            opacity: 0.7;
+        }
+
+
+        /* ============================================================
+           2. 顶部导航
+           ============================================================ */
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 25px 50px;
+
+            background-color: transparent;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+
+            z-index: 100;
+
+            transition: background 0.4s ease;
+        }
+
+        nav.scrolled {
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0.35) 40%,
+                rgba(0, 0, 0, 0) 100%
             );
+        }
 
-        min-height: 0;
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #fff;
+            text-transform: uppercase;
+        }
 
-        overflow: hidden;
+        .nav-links a {
+            margin-left: 40px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+        }
 
-        background: #000;
-    }
-
-
-    /*
-       每张 slide 不再撑开 hero。
-
-       它绝对定位在 hero 顶部，
-       自身高度由图片自然比例决定。
-
-       这样配文 bottom:0
-       就仍然跟着图片走。
-    */
-
-    .slide {
-
-        position: absolute;
-
-        top: 0;
-        left: 0;
-        right: 0;
-
-        bottom: auto;
-
-        width: 100%;
-
-        height: auto;
-
-        min-height: 0;
-
-        display: none;
-
-        opacity: 0;
-
-        align-items: unset;
-
-        justify-content: unset;
-
-        overflow: hidden;
-
-        background: #000;
-
-        transition:
-            opacity .8s ease,
-            transform .8s cubic-bezier(.2,.8,.2,1);
-    }
-
-    .slide.active {
-
-        display: block;
-
-        opacity: 1;
-    }
+        .nav-links a:hover {
+            color: #fff;
+            opacity: 0.7;
+        }
 
 
-    /*
-       图片：
+        /* ============================================================
+           3. 首页幻灯片
+           ============================================================ */
 
-       100%宽
-       高度自动
-       不裁剪
-       顶部对齐
-    */
+        .hero-slideshow {
+            position: relative;
+            width: 100%;
+            height: 85vh;
+            overflow: hidden;
+            background: #000;
+        }
 
-    .slide img {
+        .slide {
+            position: absolute;
+            inset: 0;
 
-        position: relative;
+            width: 100%;
+            height: 100%;
 
-        top: auto;
-        left: auto;
-        right: auto;
-        bottom: auto;
+            opacity: 0;
 
-        display: block;
+            transition:
+                opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 
-        width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
 
-        height: auto;
+            background: #000;
+        }
 
-        max-width: 100%;
+        .slide.active {
+            opacity: 1;
+        }
 
-        max-height: none;
+        .slide img {
+            position: absolute;
+            inset: 0;
 
-        object-fit: contain;
+            width: 100%;
+            height: 100%;
 
-        object-position: top center;
-    }
+            object-fit: cover;
+            object-position: center center;
 
+            display: block;
+        }
 
-    /*
-       图片底部渐变
-    */
+        .slide::after {
+            content: '';
 
-    .slide::after {
+            position: absolute;
 
-        position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
 
-        top: auto;
+            height: 40%;
 
-        bottom: 0;
-
-        left: 0;
-        right: 0;
-
-        height: 38%;
-
-        z-index: 1;
-
-        background:
-            linear-gradient(
+            background: linear-gradient(
                 to top,
-                rgba(0,0,0,.88) 0%,
-                rgba(0,0,0,.45) 45%,
+                rgba(0,0,0,0.85) 0%,
                 transparent 100%
             );
-    }
 
+            z-index: 1;
+            pointer-events: none;
+        }
 
-    /*
-       配文跟着图片底部。
+        .slide-caption {
+            position: absolute;
 
-       注意：
+            bottom: 55px;
+            left: 0;
+            right: 0;
 
-       slide 自己的高度就是当前图片的高度，
-       所以 bottom:0 不会跟着固定 hero
-       的底部跑。
-    */
+            z-index: 2;
 
-    .slide-caption {
+            padding: 0 40px;
 
-        position: absolute;
+            text-align: center;
+            color: #fff;
 
-        top: auto;
+            transform: translateY(20px);
+            opacity: 0;
 
-        bottom: 0;
+            transition:
+                all 1s ease 0.5s;
+        }
 
-        left: 0;
-        right: 0;
+        .slide.active .slide-caption {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
-        z-index: 2;
+        .slide-caption h3 {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
 
-        padding:
-            70px
-            25px
-            25px;
+        .slide-caption p {
+            font-size: 14px;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1.5;
+        }
 
-        text-align: center;
 
-        transform: translateY(20px);
+        /* ============================================================
+           4. 窄屏首页幻灯片
+           
+           关键修改：
+           图片高度不再强制为 100%，
+           而是按照图片自身比例显示。
+           
+           整个 slide 允许根据图片高度排列。
+           配文直接放在图片容器底部，
+           因此不会掉到图片外面。
+           ============================================================ */
 
-        opacity: 0;
+        @media (max-aspect-ratio: 1.4/1) {
 
-        transition:
-            all 1s ease .5s;
-    }
+            .hero-slideshow {
+                height: auto;
+                min-height: 0;
+            }
 
-    .slide.active .slide-caption {
+            .slide {
+                position: relative;
+                inset: auto;
 
-        transform: translateY(0);
+                width: 100%;
+                height: auto;
 
-        opacity: 1;
-    }
+                min-height: 0;
 
-    .slide-caption h3 {
+                display: none;
 
-        font-size: 22px;
+                opacity: 0;
 
-        margin-bottom: 6px;
-    }
+                align-items: unset;
+                justify-content: unset;
 
-    .slide-caption p {
+                background: #000;
+            }
 
-        font-size: 11px;
-    }
-}
+            .slide.active {
+                display: block;
+                opacity: 1;
+            }
 
+            .slide img {
+                position: relative;
+                inset: auto;
 
-/* =========================================================
-   9. MOBILE
-   ========================================================= */
+                display: block;
 
-@media (max-width: 768px) {
+                width: 100%;
+                height: auto;
 
-    nav {
+                max-width: 100%;
+                max-height: none;
+
+                object-fit: contain;
+                object-position: top center;
+            }
+
+            .slide::after {
+                position: absolute;
+
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
 
-        padding:
-            20px
-            25px;
-    }
+                height: 38%;
 
-    .logo {
+                background: linear-gradient(
+                    to top,
+                    rgba(0,0,0,0.88) 0%,
+                    rgba(0,0,0,0.45) 45%,
+                    transparent 100%
+                );
 
-        font-size: 12px;
+                z-index: 1;
+            }
 
-        letter-spacing: 3px;
-    }
+            /*
+             * 关键：
+             * caption 不再依靠一个固定 bottom 值。
+             *
+             * 它以图片底部为参照，
+             * 始终位于图片内部。
+             */
 
-    .nav-links {
+            .slide-caption {
+                position: absolute;
 
-        gap: 18px;
-    }
+                top: auto;
+                bottom: 0;
 
-    .nav-links a {
+                left: 0;
+                right: 0;
 
-        font-size: 9px;
+                z-index: 2;
 
-        letter-spacing: 1.5px;
-    }
+                padding:
+                    70px 25px
+                    25px;
 
+                text-align: center;
 
-    /*
-       不在这里写 height:auto。
+                transform: translateY(20px);
+                opacity: 0;
 
-       否则可能重新覆盖轮播高度逻辑。
-    */
+                transition:
+                    all 1s ease 0.5s;
+            }
 
-    .hero-slideshow {
+            .slide.active .slide-caption {
+                transform: translateY(0);
+                opacity: 1;
+            }
 
-        min-height: 0;
+            .slide-caption h3 {
+                font-size: 22px;
+                margin-bottom: 6px;
+            }
 
-        overflow: hidden;
-    }
+            .slide-caption p {
+                font-size: 11px;
+            }
+        }
 
 
-    .gallery-section {
+        /* ============================================================
+           5. 作品网格
+           ============================================================ */
 
-        padding:
-            90px
-            20px
-            60px;
-    }
+        .gallery-section {
+            padding: 130px 50px 100px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
 
-    .section-title {
+        .section-title {
+            font-size: 14px;
+            margin-bottom: 50px;
+            text-align: center;
+            letter-spacing: 4px;
+            color: #666;
+            text-transform: uppercase;
+        }
 
-        margin-bottom: 35px;
+        .gallery-grid {
+            columns: 3;
+            column-gap: 15px;
+        }
 
-        font-size: 12px;
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
 
-        letter-spacing: 3px;
-    }
+            background-color: transparent;
 
-    .gallery-grid {
+            margin-bottom: 15px;
 
-        columns: 1;
+            break-inside: avoid;
 
-        column-gap: 0;
-    }
+            line-height: 0;
+        }
 
-    .gallery-item {
+        .gallery-item img {
+            width: 100%;
+            height: auto;
 
-        margin-bottom: 15px;
-    }
+            display: block;
 
-    .gallery-info {
+            object-fit: cover;
 
-        opacity: 1;
+            transition:
+                transform 0.6s ease;
+        }
 
-        transform: none;
+        .gallery-item:hover img {
+            transform: scale(1.08);
+        }
 
-        padding:
-            60px
-            15px
-            15px;
-    }
+        .overlay {
+            position: absolute;
 
-    .gallery-info h3 {
+            bottom: 0;
+            left: 0;
+            right: 0;
 
-        font-size: 13px;
-    }
+            padding:
+                45px 25px 22px;
 
-    .gallery-info p {
+            background: linear-gradient(
+                to top,
+                rgba(0,0,0,0.9),
+                rgba(0,0,0,0.55) 50%,
+                transparent
+            );
 
-        font-size: 9px;
-    }
+            transform: translateY(100%);
 
+            transition:
+                transform 0.4s ease;
 
-    .slide-caption {
+            line-height: normal;
+        }
 
-        padding-left: 20px;
+        .gallery-item:hover .overlay {
+            transform: translateY(0);
+        }
 
-        padding-right: 20px;
-    }
+        .overlay h3 {
+            font-size: 18px;
+            color: #fff;
 
+            margin: 0 0 8px;
+            padding: 0;
 
-    .lightbox-top-buttons {
+            font-weight: 400;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
 
-        top: 18px;
+        .overlay p {
+            font-size: 12px;
+            opacity: 0.6;
 
-        right: 18px;
-    }
+            text-transform: uppercase;
+            letter-spacing: 1px;
 
-    .lightbox-btn {
+            margin: 0;
+            padding: 0;
 
-        width: 38px;
-        height: 38px;
-    }
+            line-height: 1.5;
+        }
 
-    .lightbox-close {
 
-        top: 18px;
+        /* ============================================================
+           6. 图片放大预览
+           ============================================================ */
 
-        left: 18px;
+        .lightbox {
+            display: none;
 
-        width: 38px;
-        height: 38px;
-    }
+            position: fixed;
 
-    .lightbox-arrow {
+            z-index: 1000;
 
-        width: 42px;
+            left: 0;
+            top: 0;
 
-        font-size: 28px;
-    }
+            width: 100%;
+            height: 100%;
 
-    .lightbox-prev {
-        left: 0;
-    }
+            background-color:
+                rgba(0, 0, 0, 0.98);
 
-    .lightbox-next {
-        right: 0;
-    }
+            justify-content: center;
+            align-items: center;
 
-    .lightbox-caption {
+            overflow: hidden;
+        }
 
-        bottom: 18px;
-    }
-}
+        .lightbox.active {
+            display: flex;
+        }
 
+        .lightbox img {
+            position: absolute;
 
-/* =========================================================
-   10. VERY SMALL MOBILE
-   ========================================================= */
+            left: 0;
+            top: 0;
 
-@media (max-width: 480px) {
+            max-width: none;
+            max-height: none;
 
-    nav {
+            width: auto;
+            height: auto;
 
-        padding:
-            18px
-            18px;
-    }
+            box-shadow:
+                0 0 50px rgba(0,0,0,0.5);
 
-    .nav-links {
+            object-fit: contain;
 
-        gap: 12px;
-    }
+            transform-origin: 0 0;
 
-    .nav-links a {
+            user-select: none;
 
-        font-size: 8px;
-    }
+            -webkit-user-drag: none;
 
-    .slide-caption h3 {
+            cursor: zoom-in;
 
-        font-size: 19px;
+            will-change: transform;
 
-        letter-spacing: 3px;
-    }
+            touch-action: none;
+        }
 
-    .slide-caption p {
+        .lightbox.zoomed #lightbox-img {
+            cursor: grab;
+        }
 
-        font-size: 9px;
+        .lightbox.dragging #lightbox-img {
+            cursor: grabbing;
+        }
 
-        letter-spacing: 2px;
-    }
-}
 
-</style>
+        /* ============================================================
+           图片切换动画
+           ============================================================ */
+
+        .lightbox.slide-next #lightbox-img {
+            animation:
+                lightboxSlideNext
+                0.38s
+                cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .lightbox.slide-prev #lightbox-img {
+            animation:
+                lightboxSlidePrev
+                0.38s
+                cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes lightboxSlideNext {
+
+            0% {
+                opacity: 0;
+                transform:
+                    translate(
+                        calc(100vw + 40px),
+                        var(--slide-y, 0px)
+                    )
+                    scale(var(--slide-scale, 1));
+            }
+
+            100% {
+                opacity: 1;
+                transform:
+                    translate(
+                        var(--slide-x, 0px),
+                        var(--slide-y, 0px)
+                    )
+                    scale(var(--slide-scale, 1));
+            }
+        }
+
+        @keyframes lightboxSlidePrev {
+
+            0% {
+                opacity: 0;
+                transform:
+                    translate(
+                        calc(-100vw - 40px),
+                        var(--slide-y, 0px)
+                    )
+                    scale(var(--slide-scale, 1));
+            }
+
+            100% {
+                opacity: 1;
+                transform:
+                    translate(
+                        var(--slide-x, 0px),
+                        var(--slide-y, 0px)
+                    )
+                    scale(var(--slide-scale, 1));
+            }
+        }
+
+
+        /* ============================================================
+           右上角工具
+           ============================================================ */
+
+        .lightbox-tools {
+            position: absolute;
+
+            top: 30px;
+            right: 40px;
+
+            z-index: 1003;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .lightbox-tool {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                rgba(0, 0, 0, 0.35);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.35);
+
+            border-radius: 3px;
+
+            color:
+                rgba(255,255,255,0.9);
+
+            cursor: pointer;
+
+            transition:
+                all 0.25s ease;
+
+            padding: 0;
+        }
+
+        .lightbox-tool:hover {
+            background:
+                rgba(255,255,255,0.12);
+
+            border-color:
+                rgba(255,255,255,0.7);
+
+            color: #fff;
+        }
+
+        .lightbox-tool svg {
+            width: 19px;
+            height: 19px;
+
+            fill: none;
+
+            stroke:
+                currentColor;
+
+            stroke-width: 1.5;
+
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+
+        /* ============================================================
+           返回
+           ============================================================ */
+
+        .lightbox-back {
+            position: absolute;
+
+            top: 30px;
+            left: 40px;
+
+            background: none;
+            border: none;
+
+            color: #fff;
+
+            font-family: inherit;
+
+            font-size: 13px;
+            font-weight: 300;
+
+            letter-spacing: 2px;
+
+            cursor: pointer;
+
+            padding: 10px 0;
+
+            transition:
+                opacity 0.3s ease;
+
+            z-index: 1002;
+        }
+
+        .lightbox-back:hover {
+            opacity: 0.55;
+        }
+
+
+        /* ============================================================
+           上一张 / 下一张
+           ============================================================ */
+
+        .lightbox-prev,
+        .lightbox-next {
+            position: absolute;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            background: none;
+            border: none;
+
+            color:
+                rgba(255,255,255,0.75);
+
+            font-size: 60px;
+            font-weight: 200;
+
+            cursor: pointer;
+
+            padding: 20px;
+
+            z-index: 1001;
+
+            transition:
+                opacity 0.3s ease;
+
+            line-height: 1;
+        }
+
+        .lightbox-prev:hover,
+        .lightbox-next:hover {
+            opacity: 0.5;
+        }
+
+        .lightbox-prev {
+            left: 25px;
+        }
+
+        .lightbox-next {
+            right: 25px;
+        }
+
+
+        /* ============================================================
+           7. ABOUT
+           ============================================================ */
+
+        .about-overlay {
+            position: fixed;
+            inset: 0;
+
+            z-index: 2000;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #000;
+
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition:
+                opacity 0.5s ease,
+                visibility 0.5s ease;
+        }
+
+        .about-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .about-content {
+            width:
+                min(
+                    760px,
+                    calc(100% - 80px)
+                );
+
+            color: #e0e0e0;
+
+            text-align: left;
+        }
+
+        .about-content p {
+            margin: 0 0 22px;
+
+            font-size: 16px;
+            line-height: 2;
+
+            font-weight: 300;
+
+            letter-spacing: 0.5px;
+        }
+
+        .about-content .about-signature {
+            margin-top: 35px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .about-content .about-email,
+        .about-content .about-date {
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            line-height: 1.7;
+
+            color: #888;
+        }
+
+        .about-email {
+            user-select: text;
+        }
+
+        .about-back {
+            position: absolute;
+
+            top: 30px;
+            left: 40px;
+
+            background: none;
+            border: none;
+
+            color: #fff;
+
+            font-family: inherit;
+
+            font-size: 13px;
+            font-weight: 300;
+
+            letter-spacing: 2px;
+
+            cursor: pointer;
+
+            padding: 10px 0;
+
+            transition:
+                opacity 0.3s ease;
+        }
+
+        .about-back:hover {
+            opacity: 0.55;
+        }
+
+
+        /* ============================================================
+           8. 页脚
+           ============================================================ */
+
+        footer {
+            text-align: center;
+
+            padding: 50px;
+
+            background: #000;
+
+            color: #444;
+
+            font-size: 12px;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+            border-top:
+                1px solid #1a1a1a;
+        }
+
+
+        /* ============================================================
+           9. 手机端
+           ============================================================ */
+
+        @media (max-width: 768px) {
+
+            nav {
+                padding: 20px 25px;
+            }
+
+            .logo {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+
+            .nav-links a {
+                margin-left: 20px;
+                font-size: 11px;
+            }
+
+            /*
+             * 手机端首页不再固定60vh。
+             *
+             * 让高度完全由当前图片自身比例决定。
+             */
+
+            .hero-slideshow {
+                height: auto;
+                min-height: 0;
+            }
+
+            .gallery-section {
+                padding:
+                    90px 20px 60px;
+            }
+
+            .gallery-grid {
+                columns: 1;
+            }
+
+            .lightbox-prev,
+            .lightbox-next {
+                font-size: 45px;
+                padding: 15px;
+            }
+
+            .lightbox-prev {
+                left: 5px;
+            }
+
+            .lightbox-next {
+                right: 5px;
+            }
+
+            .lightbox-back {
+                top: 20px;
+                left: 20px;
+                font-size: 11px;
+            }
+
+            .lightbox-tools {
+                top: 20px;
+                right: 20px;
+                gap: 8px;
+            }
+
+            .lightbox-tool {
+                width: 38px;
+                height: 38px;
+            }
+
+            .about-content {
+                width:
+                    calc(100% - 50px);
+            }
+
+            .about-content p {
+                font-size: 15px;
+                line-height: 1.9;
+                margin-bottom: 18px;
+            }
+
+            .about-content .about-signature {
+                margin-top: 28px;
+            }
+
+            .about-back {
+                top: 20px;
+                left: 25px;
+                font-size: 11px;
+            }
+        }
+
+    </style>
 </head>
 
 
 <body>
 
 
-<!-- =====================================================
-     NAVIGATION
-===================================================== -->
+    <!-- ============================================================
+         顶部信息栏
+         ============================================================ -->
 
-<nav>
+    <nav>
 
-    <a
-        href="#"
-        class="logo"
-        id="logoHome"
-    >
-        T. J. ART
-    </a>
+        <div class="logo">
+            T. J. ART
+        </div>
 
-    <ul class="nav-links">
+        <div class="nav-links">
 
-        <li>
-            <a href="#works">
-                WORKS
-            </a>
-        </li>
-
-        <li>
-            <a
-                href="#"
-                id="aboutLink"
-            >
+            <a href="#" id="about-link">
                 ABOUT
             </a>
-        </li>
-
-    </ul>
-
-</nav>
-
-
-
-<!-- =====================================================
-     HERO
-===================================================== -->
-
-<section
-    class="hero-slideshow"
-    id="heroSlideshow"
->
-
-
-    <!-- SLIDE 1 -->
-
-    <div
-        class="slide active"
-        data-index="0"
-    >
-
-        <img
-            src="Wilderness.jpg"
-            alt="Wilderness"
-        >
-
-        <div class="slide-caption">
-
-            <h3>
-                Wilderness
-            </h3>
-
-            <p>
-                内蒙 · 2020
-            </p>
 
         </div>
 
-    </div>
+    </nav>
 
 
+    <!-- ============================================================
+         首页幻灯片
+         ============================================================ -->
 
-    <!-- SLIDE 2 -->
-
-    <div
-        class="slide"
-        data-index="1"
-    >
-
-        <img
-            src="AThousandTowers.jpg"
-            alt="千塔之城"
-        >
-
-        <div class="slide-caption">
-
-            <h3>
-                千塔之城
-            </h3>
-
-            <p>
-                新疆 · 2026
-            </p>
-
-        </div>
-
-    </div>
+    <div class="hero-slideshow">
 
 
-
-    <!-- SLIDE 3 -->
-
-    <div
-        class="slide"
-        data-index="2"
-    >
-
-        <img
-            src="3AWorldofWhite.jpg"
-            alt="白雪世界"
-        >
-
-        <div class="slide-caption">
-
-            <h3>
-                白雪世界
-            </h3>
-
-            <p>
-                新疆 · 2026
-            </p>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- SLIDE 4 -->
-
-    <div
-        class="slide"
-        data-index="3"
-    >
-
-        <img
-            src="TheDepths.jpg"
-            alt="TheDepths"
-        >
-
-        <div class="slide-caption">
-
-            <h3>
-                TheDepths
-            </h3>
-
-            <p>
-                新疆 · 2026
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =====================================================
-     SELECTED WORKS
-===================================================== -->
-
-<section
-    class="gallery-section"
-    id="works"
->
-
-    <h2 class="section-title">
-        Selected Works
-    </h2>
-
-
-    <div class="gallery-grid">
-
-
-        <!-- WORK 1 -->
-
-        <div
-            class="gallery-item"
-            data-title="Wilderness"
-            data-location="内蒙 · 2020"
-        >
+        <div class="slide active">
 
             <img
                 src="Wilderness.jpg"
-                alt="Wilderness"
+                alt="作品1"
             >
 
-            <div class="gallery-info">
+            <div class="slide-caption">
 
                 <h3>
                     Wilderness
@@ -1418,21 +1029,14 @@ footer {
         </div>
 
 
-
-        <!-- WORK 2 -->
-
-        <div
-            class="gallery-item"
-            data-title="千塔之城"
-            data-location="新疆 · 2026"
-        >
+        <div class="slide">
 
             <img
                 src="AThousandTowers.jpg"
-                alt="千塔之城"
+                alt="作品2"
             >
 
-            <div class="gallery-info">
+            <div class="slide-caption">
 
                 <h3>
                     千塔之城
@@ -1447,21 +1051,14 @@ footer {
         </div>
 
 
-
-        <!-- WORK 3 -->
-
-        <div
-            class="gallery-item"
-            data-title="白雪世界"
-            data-location="新疆 · 2026"
-        >
+        <div class="slide">
 
             <img
                 src="3AWorldofWhite.jpg"
-                alt="白雪世界"
+                alt="作品3"
             >
 
-            <div class="gallery-info">
+            <div class="slide-caption">
 
                 <h3>
                     白雪世界
@@ -1476,21 +1073,14 @@ footer {
         </div>
 
 
-
-        <!-- WORK 4 -->
-
-        <div
-            class="gallery-item"
-            data-title="TheDepths"
-            data-location="新疆 · 2026"
-        >
+        <div class="slide">
 
             <img
                 src="TheDepths.jpg"
-                alt="TheDepths"
+                alt="作品5"
             >
 
-            <div class="gallery-info">
+            <div class="slide-caption">
 
                 <h3>
                     TheDepths
@@ -1507,430 +1097,449 @@ footer {
 
     </div>
 
-</section>
 
+    <!-- ============================================================
+         作品网格
+         ============================================================ -->
 
+    <section class="gallery-section">
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer>
-
-    © 2026 T. J. ART
-
-</footer>
-
-
-
-<!-- =====================================================
-     ABOUT OVERLAY
-===================================================== -->
-
-<div
-    class="about-overlay"
-    id="aboutOverlay"
->
-
-    <button
-        class="about-close"
-        id="aboutClose"
-        aria-label="Close"
-    >
-        ×
-    </button>
-
-    <div class="about-content">
-
-        <h2>
-            T. J. ART
+        <h2 class="section-title">
+            Selected Works
         </h2>
 
-        <p>
-            Photography Portfolio
-        </p>
 
-        <p>
-            Through photography,
-            I record landscapes,
-            places and moments
-            that leave an impression.
-        </p>
-
-        <p>
-            中国 · 2026
-        </p>
-
-    </div>
-
-</div>
+        <div class="gallery-grid">
 
 
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheAncientWasteland.jpg" alt="古老遗迹">
+                <div class="overlay">
+                    <h3>古老遗迹</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
 
-<!-- =====================================================
-     LIGHTBOX
-===================================================== -->
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheDepths.jpg" alt="TheDepths">
+                <div class="overlay">
+                    <h3>TheDepths</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
 
-<div
-    class="lightbox"
-    id="lightbox"
->
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="AThousandTowers.jpg" alt="千塔之城">
+                <div class="overlay">
+                    <h3>千塔之城</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
 
-
-    <!-- CLOSE -->
-
-    <button
-        class="lightbox-close"
-        id="lightboxClose"
-        aria-label="Close"
-    >
-        ×
-    </button>
-
-
-
-    <!-- TOP BUTTONS -->
-
-    <div class="lightbox-top-buttons">
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="AnywhereDoor.jpg" alt="任意门">
+                <div class="overlay">
+                    <h3>任意门</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
 
 
-        <!-- FULLSCREEN -->
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Paradise.jpg" alt="Paradise">
+                <div class="overlay">
+                    <h3>Paradise</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Clean.jpg" alt="净">
+                <div class="overlay">
+                    <h3>净</h3>
+                    <p>四川 · 2025</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="MarchofFlames.jpg" alt="烈焰进行曲">
+                <div class="overlay">
+                    <h3>烈焰进行曲</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="BathofLight.jpg" alt="Bath of Light">
+                <div class="overlay">
+                    <h3>Bath of Light</h3>
+                    <p>内蒙 · 2020</p>
+                </div>
+            </div>
+
+                        <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="TheGreatGrassland.jpg" alt="大草原">
+                <div class="overlay">
+                    <h3>大草原</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+            
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="ABladeAboveFrost.jpg" alt="寒天之刃">
+                <div class="overlay">
+                    <h3>寒天之刃</h3>
+                    <p>四川 · 2025</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Wilderness.jpg" alt="Wilderness">
+                <div class="overlay">
+                    <h3>Wilderness</h3>
+                    <p>内蒙 · 2020</p>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Flow.jpg" alt="流淌">
+                <div class="overlay">
+                    <h3>流淌</h3>
+                    <p>陕西 · 2023</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="HiddenRealm.jpg" alt="隐秘之境">
+                <div class="overlay">
+                    <h3>隐秘之境</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Curl.jpg" alt="Curl">
+                <div class="overlay">
+                    <h3>Curl</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="AutumnEmerges.jpg" alt="秋色乍现">
+                <div class="overlay">
+                    <h3>秋色乍现</h3>
+                    <p>四川 · 2025</p>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Waves.jpg" alt="Waves">
+                <div class="overlay">
+                    <h3>Waves</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="FirstLight.jpg" alt="FirstLight">
+                <div class="overlay">
+                    <h3>FirstLight</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Tempest.jpg" alt="暴风雨">
+                <div class="overlay">
+                    <h3>暴风雨</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Isekai.jpg" alt="异世界">
+                <div class="overlay">
+                    <h3>异世界</h3>
+                    <p>北京 · 2021</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="ColdAir.jpg" alt="空气微凉">
+                <div class="overlay">
+                    <h3>空气微凉</h3>
+                    <p>四川 · 2025</p>
+                </div>
+            </div>
+            
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="WorldofSnow.jpg" alt="白雪世界">
+                <div class="overlay">
+                    <h3>白雪世界</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="StoneEye.jpg" alt="Stone's Eye">
+                <div class="overlay">
+                    <h3>Stone's Eye</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Morning.jpg" alt="清晨">
+                <div class="overlay">
+                    <h3>清晨</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Samsara.jpg" alt="乾坤">
+                <div class="overlay">
+                    <h3>乾坤</h3>
+                    <p>北京 · 2022</p>
+                </div>
+            </div>
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="SleepWalking.jpg" alt="梦游">
+                <div class="overlay">
+                    <h3>梦游</h3>
+                    <p>内蒙 · 2022</p>
+                </div>
+            </div>
+
+
+            <div class="gallery-item" onclick="openLightbox(this)">
+                <img src="Dawn.jpg" alt="暮光">
+                <div class="overlay">
+                    <h3>暮光</h3>
+                    <p>新疆 · 2026</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         图片放大预览
+         ============================================================ -->
+
+    <div id="lightbox" class="lightbox">
+
 
         <button
-            class="lightbox-btn"
-            id="fullscreenBtn"
-            aria-label="Fullscreen"
-            title="Fullscreen"
+            class="lightbox-back"
+            onclick="closeLightbox()"
         >
-            ⛶
+            ← BACK
         </button>
 
 
-        <!-- DOWNLOAD -->
+        <div class="lightbox-tools">
+
+
+            <button
+                id="fullscreen-btn"
+                class="lightbox-tool"
+                onclick="toggleFullscreen(event)"
+                aria-label="全屏"
+                title="全屏"
+            >
+
+                <svg
+                    id="fullscreen-icon"
+                    viewBox="0 0 24 24"
+                >
+
+                    <path d="M8 3H3v5"></path>
+                    <path d="M16 3h5v5"></path>
+                    <path d="M8 21H3v-5"></path>
+                    <path d="M16 21h5v-5"></path>
+
+                </svg>
+
+            </button>
+
+
+            <button
+                class="lightbox-tool"
+                onclick="downloadCurrentImage(event)"
+                aria-label="下载图片"
+                title="下载图片"
+            >
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M12 3v12"></path>
+                    <path d="M7 10l5 5 5-5"></path>
+                    <path d="M4 21h16"></path>
+
+                </svg>
+
+            </button>
+
+
+        </div>
+
 
         <button
-            class="lightbox-btn"
-            id="downloadBtn"
-            aria-label="Download"
-            title="Download"
+            class="lightbox-prev"
+            onclick="
+                event.stopPropagation();
+                previousImage();
+            "
+            aria-label="上一张"
         >
-            ↓
+            ‹
         </button>
 
-
-    </div>
-
-
-
-    <!-- PREVIOUS -->
-
-    <button
-        class="lightbox-arrow lightbox-prev"
-        id="lightboxPrev"
-        aria-label="Previous"
-    >
-        ‹
-    </button>
-
-
-
-    <!-- IMAGE STAGE -->
-
-    <div
-        class="lightbox-stage"
-        id="lightboxStage"
-    >
 
         <img
             id="lightbox-img"
             src=""
-            alt=""
+            alt="Preview"
         >
 
+
+        <button
+            class="lightbox-next"
+            onclick="
+                event.stopPropagation();
+                nextImage();
+            "
+            aria-label="下一张"
+        >
+            ›
+        </button>
+
+
     </div>
 
 
-
-    <!-- NEXT -->
-
-    <button
-        class="lightbox-arrow lightbox-next"
-        id="lightboxNext"
-        aria-label="Next"
-    >
-        ›
-    </button>
-
-
-
-    <!-- CAPTION -->
+    <!-- ============================================================
+         ABOUT
+         ============================================================ -->
 
     <div
-        class="lightbox-caption"
-        id="lightboxCaption"
+        id="about-overlay"
+        class="about-overlay"
+        aria-hidden="true"
     >
 
-        <h3 id="lightboxTitle"></h3>
 
-        <p id="lightboxLocation"></p>
+        <button
+            id="about-back"
+            class="about-back"
+            aria-label="返回"
+        >
+            ← BACK
+        </button>
+
+
+        <div class="about-content">
+
+
+            <p>
+                你好，我是一名摄影爱好者，也是一名在读的博士研究生。我通过这个网站向你分享作品，并讲述作品背后的故事。
+            </p>
+
+
+            <p>
+                我的摄影之旅从2019年开始，如今已经成为了一种生活方式。每当远离城市、走进旷野，随意地开着车，我都感到心旷神怡。我尝试通过镜头表达自己对所及之处的感受，就有了这些图片。
+            </p>
+
+
+            <p>
+                希望这些图片能带给你一缕旷野的风。
+            </p>
+
+
+            <p class="about-signature">
+                T. J. Wan
+            </p>
+
+
+            <p class="about-email">
+                wantianjian@163.com
+            </p>
+
+
+            <p class="about-date">
+                Sep, 2026.
+            </p>
+
+
+        </div>
 
     </div>
 
-</div>
+
+    <footer>
+        &copy; 2026 T. J. ART. All Rights Reserved.
+    </footer>
 
 
 
 <script>
 
-/* =========================================================
-   1. HERO SLIDESHOW
-========================================================= */
 
-const slides =
-    document.querySelectorAll(".slide");
+    /* ============================================================
+       1. 首页自动幻灯片
+       ============================================================ */
 
-let currentSlide = 0;
-
-const INTERVAL_TIME = 5000;
-
-
-/*
-   本次最重要的修复：
-
-   在窄屏下，hero 的高度不能再跟着当前图片变化。
-
-   计算所有轮播图片在当前屏幕宽度下的实际高度，
-   取最大值。
-
-   例如：
-
-   图片 A → 500px
-   图片 B → 680px
-   图片 C → 540px
-   图片 D → 620px
-
-   那么：
-
-   hero = 680px
-
-   切换图片时：
-   500 → 680
-   680 → 540
-
-   hero 本身始终 680px。
-
-   所以 Selected Works 完全不会移动。
-*/
-
-const hero =
-    document.getElementById(
-        "heroSlideshow"
-    );
-
-
-function isNarrowScreen() {
-
-    return window.matchMedia(
-        "(max-aspect-ratio: 1.4/1)"
-    ).matches;
-}
-
-
-function updateHeroHeight() {
-
-    if (!hero) return;
-
-
-    /*
-       宽屏恢复原来的 CSS 高度
-    */
-
-    if (!isNarrowScreen()) {
-
-        hero.style.removeProperty(
-            "--hero-slideshow-height"
+    const slides =
+        document.querySelectorAll(
+            '.slide'
         );
 
-        hero.style.height = "";
+    let currentSlide = 0;
 
-        return;
-    }
-
-
-    const images =
-        hero.querySelectorAll(
-            ".slide img"
-        );
+    const INTERVAL_TIME = 5000;
 
 
-    const heroWidth =
-        hero.clientWidth;
+    function nextSlide() {
 
-
-    if (!heroWidth) return;
-
-
-    let maxHeight = 0;
-
-
-    images.forEach(img => {
-
-        if (
-            img.naturalWidth > 0 &&
-            img.naturalHeight > 0
-        ) {
-
-            const imageHeight =
-                heroWidth *
-                (
-                    img.naturalHeight /
-                    img.naturalWidth
-                );
-
-
-            maxHeight =
-                Math.max(
-                    maxHeight,
-                    imageHeight
-                );
+        if (!slides.length) {
+            return;
         }
 
-    });
+        slides[currentSlide]
+            .classList
+            .remove('active');
 
 
-    if (maxHeight > 0) {
-
-        hero.style.setProperty(
-            "--hero-slideshow-height",
-            `${Math.ceil(maxHeight)}px`
-        );
-
-        hero.style.height =
-            `${Math.ceil(maxHeight)}px`;
-    }
-}
+        currentSlide =
+            (
+                currentSlide + 1
+            ) %
+            slides.length;
 
 
-/*
-   页面刚打开时执行
-*/
-
-updateHeroHeight();
-
-
-/*
-   图片加载完成后再次计算。
-
-   防止图片还没加载完成时
-   naturalWidth / naturalHeight 为 0。
-*/
-
-hero
-    .querySelectorAll(".slide img")
-    .forEach(img => {
-
-        if (img.complete) {
-
-            updateHeroHeight();
-
-        } else {
-
-            img.addEventListener(
-                "load",
-                updateHeroHeight
-            );
-        }
-
-    });
-
-
-/*
-   浏览器窗口尺寸改变时重新计算。
-
-   因为图片宽度改变以后，
-   图片自然高度也会改变。
-*/
-
-window.addEventListener(
-    "resize",
-    updateHeroHeight
-);
-
-
-
-/* =========================================================
-   HERO SLIDE TRANSITION
-========================================================= */
-
-function nextSlide() {
-
-    if (!slides.length) return;
-
-
-    const oldSlide =
-        slides[currentSlide];
-
-
-    const nextIndex =
-        (currentSlide + 1) %
-        slides.length;
-
-
-    const next =
-        slides[nextIndex];
-
-
-    /*
-       窄屏增加左右切换方向动画
-    */
-
-    if (isNarrowScreen()) {
-
-        oldSlide.style.transform =
-            "translateX(-100%)";
-
-        next.style.transform =
-            "translateX(100%)";
-
-        next.classList.add("active");
-
-
-        requestAnimationFrame(() => {
-
-            next.style.transform =
-                "translateX(0)";
-
-        });
-
-
-        setTimeout(() => {
-
-            oldSlide.classList.remove(
-                "active"
-            );
-
-            oldSlide.style.transform = "";
-
-        }, 800);
-
-    } else {
-
-        oldSlide.classList.remove(
-            "active"
-        );
-
-        next.classList.add(
-            "active"
-        );
+        slides[currentSlide]
+            .classList
+            .add('active');
     }
 
 
-    currentSlide =
-        nextIndex;
-}
-
-
-let slideshowTimer =
     setInterval(
         nextSlide,
         INTERVAL_TIME
@@ -1938,1195 +1547,1906 @@ let slideshowTimer =
 
 
 
-/* =========================================================
-   2. GALLERY DATA
-========================================================= */
-
-const galleryItems =
-    Array.from(
-        document.querySelectorAll(
-            ".gallery-item"
-        )
-    );
-
-
-/*
-   从 gallery 中获取图片
-*/
-
-const galleryImages =
-    galleryItems.map(item => {
-
-        const img =
-            item.querySelector("img");
-
-        return {
-
-            src: img.src,
-
-            title:
-                item.dataset.title ||
-                img.alt ||
-                "",
-
-            location:
-                item.dataset.location ||
-                ""
-
-        };
-
-    });
-
-
-
-/* =========================================================
-   3. LIGHTBOX
-========================================================= */
-
-const lightbox =
-    document.getElementById(
-        "lightbox"
-    );
-
-const lightboxStage =
-    document.getElementById(
-        "lightboxStage"
-    );
-
-const lightboxImg =
-    document.getElementById(
-        "lightbox-img"
-    );
-
-const lightboxTitle =
-    document.getElementById(
-        "lightboxTitle"
-    );
-
-const lightboxLocation =
-    document.getElementById(
-        "lightboxLocation"
-    );
-
-const lightboxClose =
-    document.getElementById(
-        "lightboxClose"
-    );
-
-const lightboxPrev =
-    document.getElementById(
-        "lightboxPrev"
-    );
-
-const lightboxNext =
-    document.getElementById(
-        "lightboxNext"
-    );
-
-const fullscreenBtn =
-    document.getElementById(
-        "fullscreenBtn"
-    );
-
-const downloadBtn =
-    document.getElementById(
-        "downloadBtn"
-    );
-
-
-let currentImageIndex = 0;
-
-
-
-/* =========================================================
-   ZOOM STATE
-========================================================= */
-
-let zoomScale = 1;
-
-let targetScale = 1;
-
-let translateX = 0;
-
-let translateY = 0;
-
-let targetX = 0;
-
-let targetY = 0;
-
-let animationFrame = null;
-
-let isDragging = false;
-
-let dragStartX = 0;
-
-let dragStartY = 0;
-
-let dragOriginX = 0;
-
-let dragOriginY = 0;
-
-
-/*
-   最小倍率
-*/
-
-const MIN_SCALE = 1;
-
-
-/*
-   最大倍率
-*/
-
-const MAX_SCALE = 8;
-
-
-/*
-   默认点击后放大的倍率
-*/
-
-const CLICK_ZOOM = 2;
-
-
-
-/* =========================================================
-   IMAGE TRANSFORM
-========================================================= */
-
-function applyTransform() {
-
-    lightboxImg.style.transform =
-        `translate3d(
-            calc(-50% + ${translateX}px),
-            calc(-50% + ${translateY}px),
-            0
-        ) scale(${zoomScale})`;
-}
-
-
-function animateTransform() {
-
-    if (animationFrame) return;
-
-
-    function frame() {
-
-        const scaleDiff =
-            targetScale -
-            zoomScale;
-
-        const xDiff =
-            targetX -
-            translateX;
-
-        const yDiff =
-            targetY -
-            translateY;
-
-
-        zoomScale +=
-            scaleDiff * 0.16;
-
-        translateX +=
-            xDiff * 0.16;
-
-        translateY +=
-            yDiff * 0.16;
-
-
-        /*
-           防止无限接近
-        */
-
-        if (
-            Math.abs(scaleDiff) < 0.001 &&
-            Math.abs(xDiff) < 0.1 &&
-            Math.abs(yDiff) < 0.1
-        ) {
-
-            zoomScale =
-                targetScale;
-
-            translateX =
-                targetX;
-
-            translateY =
-                targetY;
-
-            animationFrame = null;
-
-            applyTransform();
-
-            return;
-        }
-
-
-        applyTransform();
-
-        animationFrame =
-            requestAnimationFrame(
-                frame
-            );
-    }
-
-
-    animationFrame =
-        requestAnimationFrame(
-            frame
+    /* ============================================================
+       2. 导航栏滚动
+       ============================================================ */
+
+    const nav =
+        document.querySelector('nav');
+
+    const heroSection =
+        document.querySelector(
+            '.hero-slideshow'
         );
-}
-
-
-
-/* =========================================================
-   RESET ZOOM
-========================================================= */
-
-function resetZoom(
-    smooth = true
-) {
-
-    targetScale = 1;
-
-    targetX = 0;
-
-    targetY = 0;
-
-
-    if (smooth) {
-
-        animateTransform();
-
-    } else {
-
-        zoomScale = 1;
-
-        translateX = 0;
-
-        translateY = 0;
-
-        applyTransform();
-    }
-}
-
-
-
-/* =========================================================
-   OPEN IMAGE
-========================================================= */
-
-function openLightbox(index) {
-
-    if (
-        index < 0 ||
-        index >= galleryImages.length
-    ) return;
-
-
-    currentImageIndex =
-        index;
-
-
-    const data =
-        galleryImages[index];
-
-
-    lightboxImg.src =
-        data.src;
-
-    lightboxImg.alt =
-        data.title;
-
-
-    lightboxTitle.textContent =
-        data.title;
-
-    lightboxLocation.textContent =
-        data.location;
-
-
-    resetZoom(false);
-
-
-    lightbox.classList.add(
-        "open"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-
-
-    /*
-       图片加载以后重新确定默认状态
-    */
-
-    lightboxImg.onload =
-        () => {
-
-            resetZoom(false);
-
-        };
-}
-
-
-
-/* =========================================================
-   CLOSE LIGHTBOX
-========================================================= */
-
-function closeLightbox() {
-
-    lightbox.classList.remove(
-        "open"
-    );
-
-
-    document.body.style.overflow =
-        "";
 
 
     if (
-        document.fullscreenElement
+        nav &&
+        heroSection
     ) {
 
-        document.exitFullscreen()
-            .catch(() => {});
-
-    }
-}
-
-
-
-/* =========================================================
-   GALLERY CLICK
-========================================================= */
-
-galleryItems.forEach(
-    (item, index) => {
-
-        item.addEventListener(
-            "click",
+        window.addEventListener(
+            'scroll',
             () => {
 
-                openLightbox(index);
+                if (
+                    window.scrollY >
+                    heroSection.offsetHeight -
+                    100
+                ) {
+
+                    nav.classList.add(
+                        'scrolled'
+                    );
+
+                } else {
+
+                    nav.classList.remove(
+                        'scrolled'
+                    );
+                }
 
             }
         );
-
     }
-);
 
 
 
-/* =========================================================
-   CLOSE BUTTON
-========================================================= */
+    /* ============================================================
+       3. 图片放大预览
+       ============================================================ */
 
-lightboxClose.addEventListener(
-    "click",
-    closeLightbox
-);
+    const lightbox =
+        document.getElementById(
+            'lightbox'
+        );
+
+    const lightboxImg =
+        document.getElementById(
+            'lightbox-img'
+        );
+
+
+    const galleryItems =
+        Array.from(
+            document.querySelectorAll(
+                '.gallery-item'
+            )
+        );
+
+
+    let currentImageIndex = 0;
+
+
+    /* ============================================================
+       图片状态
+       ============================================================ */
+
+    let imageScale = 1;
+    let defaultScale = 1;
+
+    let imageX = 0;
+    let imageY = 0;
+
+    let defaultX = 0;
+    let defaultY = 0;
+
+
+    let animationFrame = null;
+
+
+    let isZoomed = false;
+
+
+    /* ============================================================
+       缩放参数
+       ============================================================ */
+
+    const MAX_ZOOM = 10;
+
+    const CLICK_ZOOM = 2.4;
+
+    const WHEEL_ZOOM_IN = 1.5;
+
+
+    const ZOOM_ANIMATION_TIME = 110;
+
+    const RESET_ANIMATION_TIME = 140;
 
 
 
-/*
-   点击黑色背景关闭。
+    /* ============================================================
+       鼠标拖动
+       ============================================================ */
 
-   但点击图片本身不能关闭。
-*/
+    let isDragging = false;
 
-lightbox.addEventListener(
-    "click",
-    event => {
+    let dragStartX = 0;
+    let dragStartY = 0;
 
-        if (
-            event.target ===
-            lightbox
-        ) {
+    let dragImageStartX = 0;
+    let dragImageStartY = 0;
 
-            closeLightbox();
 
-        }
+    const DRAG_THRESHOLD = 5;
 
+    let hasDragged = false;
+
+
+
+    /* ============================================================
+       手机触控
+       ============================================================ */
+
+    let isPinching = false;
+
+    let pinchStartDistance = 0;
+
+    let pinchStartScale = 1;
+
+    let pinchCenterX = 0;
+    let pinchCenterY = 0;
+
+    let pinchImagePointX = 0;
+    let pinchImagePointY = 0;
+
+
+    let isTouching = false;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    let touchLastX = 0;
+    let touchLastY = 0;
+
+    let touchMoved = false;
+
+
+    const SWIPE_THRESHOLD = 50;
+
+    const TOUCH_MOVE_THRESHOLD = 8;
+
+
+    let lastTouchWasPinch = false;
+
+    let touchEndTime = 0;
+
+
+
+    /* ============================================================
+       打开图片
+       ============================================================ */
+
+    function openLightbox(element) {
+
+        currentImageIndex =
+            galleryItems.indexOf(
+                element
+            );
+
+
+        lightbox.classList.add(
+            'active'
+        );
+
+
+        document.body.style.overflow =
+            'hidden';
+
+
+        showImage(
+            currentImageIndex
+        );
     }
-);
 
 
 
-/* =========================================================
-   PREVIOUS / NEXT
-========================================================= */
+    /* ============================================================
+       图片切换动画
+       ============================================================ */
 
-function showPrevious() {
-
-    if (!galleryImages.length)
-        return;
+    let pendingSlideDirection = null;
 
 
-    currentImageIndex =
-        (
-            currentImageIndex -
-            1 +
-            galleryImages.length
-        ) %
-        galleryImages.length;
-
-
-    openLightbox(
-        currentImageIndex
-    );
-}
-
-
-function showNext() {
-
-    if (!galleryImages.length)
-        return;
-
-
-    currentImageIndex =
-        (
-            currentImageIndex +
-            1
-        ) %
-        galleryImages.length;
-
-
-    openLightbox(
-        currentImageIndex
-    );
-}
-
-
-lightboxPrev.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        showPrevious();
-
-    }
-);
-
-
-lightboxNext.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        showNext();
-
-    }
-);
-
-
-
-/* =========================================================
-   4. MOUSE CLICK ZOOM
-========================================================= */
-
-/*
-   计算鼠标位置，使点击的位置成为缩放中心。
-*/
-
-function zoomAtPoint(
-    clientX,
-    clientY,
-    newScale
-) {
-
-    const rect =
-        lightboxStage.getBoundingClientRect();
-
-
-    const centerX =
-        rect.left +
-        rect.width / 2;
-
-
-    const centerY =
-        rect.top +
-        rect.height / 2;
-
-
-    /*
-       鼠标相对于图片中心的位置
-    */
-
-    const pointX =
-        clientX -
-        centerX;
-
-    const pointY =
-        clientY -
-        centerY;
-
-
-    const oldScale =
-        zoomScale;
-
-
-    const scaleRatio =
-        newScale /
-        oldScale;
-
-
-    /*
-       让鼠标下面的图像内容保持不动
-    */
-
-    targetX =
-        pointX -
-        (
-            pointX -
-            targetX
-        ) *
-        scaleRatio;
-
-
-    targetY =
-        pointY -
-        (
-            pointY -
-            targetY
-        ) *
-        scaleRatio;
-
-
-    targetScale =
-        newScale;
-
-
-    animateTransform();
-}
-
-
-
-lightboxImg.addEventListener(
-    "click",
-    event => {
+    function playImageSlideAnimation(
+        direction
+    ) {
 
         /*
-           如果刚刚拖动过，
-           不执行点击缩放。
-        */
+         * 删除之前的动画类。
+         */
+
+        lightbox.classList.remove(
+            'slide-next',
+            'slide-prev'
+        );
+
+
+        /*
+         * 强制浏览器重新计算，
+         * 确保连续快速切图时动画仍然触发。
+         */
+
+        void lightboxImg.offsetWidth;
+
+
+        /*
+         * 当前 transform 位置写入 CSS 变量。
+         */
+
+        lightboxImg.style.setProperty(
+            '--slide-x',
+            `${imageX}px`
+        );
+
+        lightboxImg.style.setProperty(
+            '--slide-y',
+            `${imageY}px`
+        );
+
+        lightboxImg.style.setProperty(
+            '--slide-scale',
+            `${imageScale}`
+        );
+
 
         if (
-            lightboxImg.dataset.dragged ===
-            "true"
+            direction === 'next'
         ) {
 
-            lightboxImg.dataset.dragged =
-                "false";
-
-            return;
-        }
-
-
-        if (
-            zoomScale <= 1.01
-        ) {
-
-            zoomAtPoint(
-                event.clientX,
-                event.clientY,
-                CLICK_ZOOM
+            lightbox.classList.add(
+                'slide-next'
             );
 
         } else {
 
-            resetZoom(true);
-
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   5. MOUSE WHEEL ZOOM
-========================================================= */
-
-lightboxStage.addEventListener(
-    "wheel",
-    event => {
-
-        event.preventDefault();
-
-
-        /*
-           滚轮上：
-           放大
-
-           滚轮下：
-           缩小
-        */
-
-        const zoomFactor =
-            event.deltaY < 0
-                ? 1.12
-                : 0.88;
-
-
-        let newScale =
-            targetScale *
-            zoomFactor;
-
-
-        newScale =
-            Math.max(
-                MIN_SCALE,
-                Math.min(
-                    MAX_SCALE,
-                    newScale
-                )
+            lightbox.classList.add(
+                'slide-prev'
             );
+        }
 
 
         /*
-           已经回到默认倍率时，
-           自动回到默认位置。
-        */
+         * 动画结束后清除。
+         */
 
-        if (
-            newScale <= 1.001
-        ) {
+        setTimeout(
+            () => {
 
-            resetZoom(true);
+                lightbox.classList.remove(
+                    'slide-next',
+                    'slide-prev'
+                );
 
-            return;
-        }
-
-
-        zoomAtPoint(
-            event.clientX,
-            event.clientY,
-            newScale
+            },
+            420
         );
-
-    },
-    {
-        passive: false
     }
-);
 
 
 
-/* =========================================================
-   6. MOUSE DRAG
-========================================================= */
+    /* ============================================================
+       显示图片
+       ============================================================ */
 
-lightboxImg.addEventListener(
-    "mousedown",
-    event => {
+    function showImage(
+        index,
+        direction = null
+    ) {
 
         if (
-            zoomScale <= 1.01
-        ) return;
-
-
-        event.preventDefault();
-
-
-        isDragging = true;
-
-        lightboxImg.dataset.dragged =
-            "false";
-
-
-        dragStartX =
-            event.clientX;
-
-        dragStartY =
-            event.clientY;
-
-
-        dragOriginX =
-            targetX;
-
-        dragOriginY =
-            targetY;
-
-
-        lightboxImg.style.cursor =
-            "grabbing";
-    }
-);
-
-
-window.addEventListener(
-    "mousemove",
-    event => {
-
-        if (!isDragging) return;
-
-
-        const dx =
-            event.clientX -
-            dragStartX;
-
-        const dy =
-            event.clientY -
-            dragStartY;
-
-
-        if (
-            Math.abs(dx) > 3 ||
-            Math.abs(dy) > 3
+            !galleryItems.length
         ) {
 
-            lightboxImg.dataset.dragged =
-                "true";
+            return;
         }
 
 
-        targetX =
-            dragOriginX +
-            dx;
+        if (
+            index < 0
+        ) {
 
-        targetY =
-            dragOriginY +
-            dy;
-
-
-        zoomScale =
-            targetScale;
+            index =
+                galleryItems.length - 1;
+        }
 
 
-        translateX =
-            targetX;
+        if (
+            index >=
+            galleryItems.length
+        ) {
 
-        translateY =
-            targetY;
-
-
-        applyTransform();
-
-    }
-);
+            index = 0;
+        }
 
 
-window.addEventListener(
-    "mouseup",
-    () => {
-
-        if (!isDragging)
-            return;
+        currentImageIndex =
+            index;
 
 
         isDragging = false;
 
-        lightboxImg.style.cursor =
-            zoomScale > 1.01
-                ? "grab"
-                : "zoom-in";
-    }
-);
+        isPinching = false;
 
+        isTouching = false;
 
+        hasDragged = false;
 
-/* =========================================================
-   7. MOBILE TOUCH
-========================================================= */
+        touchMoved = false;
 
-let touchMode = null;
-
-let touchStartX = 0;
-
-let touchStartY = 0;
-
-let touchLastX = 0;
-
-let touchLastY = 0;
-
-let touchMoved = false;
-
-let initialPinchDistance = 0;
-
-let initialPinchScale = 1;
-
-let pinchCenterX = 0;
-
-let pinchCenterY = 0;
-
-
-
-function getTouchDistance(
-    touch1,
-    touch2
-) {
-
-    const dx =
-        touch1.clientX -
-        touch2.clientX;
-
-    const dy =
-        touch1.clientY -
-        touch2.clientY;
-
-
-    return Math.sqrt(
-        dx * dx +
-        dy * dy
-    );
-}
-
-
-function getTouchCenter(
-    touch1,
-    touch2
-) {
-
-    return {
-
-        x:
-            (
-                touch1.clientX +
-                touch2.clientX
-            ) / 2,
-
-        y:
-            (
-                touch1.clientY +
-                touch2.clientY
-            ) / 2
-
-    };
-}
-
-
-
-/*
-   TOUCH START
-*/
-
-lightboxStage.addEventListener(
-    "touchstart",
-    event => {
-
-        if (
-            event.touches.length === 1
-        ) {
-
-            const touch =
-                event.touches[0];
-
-
-            touchMode =
-                "single";
-
-
-            touchStartX =
-                touch.clientX;
-
-            touchStartY =
-                touch.clientY;
-
-
-            touchLastX =
-                touch.clientX;
-
-            touchLastY =
-                touch.clientY;
-
-
-            touchMoved =
-                false;
-
-
-        } else if (
-            event.touches.length === 2
-        ) {
-
-            touchMode =
-                "pinch";
-
-
-            initialPinchDistance =
-                getTouchDistance(
-                    event.touches[0],
-                    event.touches[1]
-                );
-
-
-            initialPinchScale =
-                targetScale;
-
-
-            const center =
-                getTouchCenter(
-                    event.touches[0],
-                    event.touches[1]
-                );
-
-
-            pinchCenterX =
-                center.x;
-
-            pinchCenterY =
-                center.y;
-
-
-            event.preventDefault();
-        }
-
-    },
-    {
-        passive: false
-    }
-);
-
-
-
-/*
-   TOUCH MOVE
-*/
-
-lightboxStage.addEventListener(
-    "touchmove",
-    event => {
 
         /*
-           双指缩放
-        */
+         * 取消旧动画。
+         */
+
+        if (animationFrame) {
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            animationFrame = null;
+        }
+
+
+        const img =
+            galleryItems[
+                currentImageIndex
+            ].querySelector(
+                'img'
+            );
+
+
+        if (!img) {
+            return;
+        }
+
+
+        lightboxImg.onload =
+            function() {
+
+                resetImageView(
+                    false
+                );
+
+
+                /*
+                 * 新图片载入完成以后，
+                 * 再播放左右滑入动画。
+                 */
+
+                if (
+                    direction
+                ) {
+
+                    playImageSlideAnimation(
+                        direction
+                    );
+                }
+
+            };
+
+
+        lightboxImg.src =
+            img.src;
+
+
+        lightboxImg.alt =
+            img.alt;
+
 
         if (
-            event.touches.length === 2
+            lightboxImg.complete
         ) {
 
-            touchMode =
-                "pinch";
-
-
-            event.preventDefault();
-
-
-            const distance =
-                getTouchDistance(
-                    event.touches[0],
-                    event.touches[1]
-                );
+            resetImageView(
+                false
+            );
 
 
             if (
-                initialPinchDistance <= 0
-            ) return;
-
-
-            const ratio =
-                distance /
-                initialPinchDistance;
-
-
-            let newScale =
-                initialPinchScale *
-                ratio;
-
-
-            newScale =
-                Math.max(
-                    MIN_SCALE,
-                    Math.min(
-                        MAX_SCALE,
-                        newScale
-                    )
-                );
-
-
-            if (
-                newScale <= 1.001
+                direction
             ) {
 
-                resetZoom(false);
+                playImageSlideAnimation(
+                    direction
+                );
+            }
+        }
+    }
+
+
+
+    /* ============================================================
+       计算默认视角
+       ============================================================ */
+
+    function calculateDefaultView() {
+
+        if (
+            !lightboxImg.naturalWidth ||
+            !lightboxImg.naturalHeight
+        ) {
+
+            return;
+        }
+
+
+        const viewportWidth =
+            window.innerWidth;
+
+        const viewportHeight =
+            window.innerHeight;
+
+
+        const availableWidth =
+            viewportWidth *
+            0.90;
+
+        const availableHeight =
+            viewportHeight *
+            0.90;
+
+
+        const fitScale =
+            Math.min(
+
+                availableWidth /
+                    lightboxImg.naturalWidth,
+
+                availableHeight /
+                    lightboxImg.naturalHeight
+
+            );
+
+
+        defaultScale =
+            Math.min(
+                1,
+                fitScale
+            );
+
+
+        const displayWidth =
+            lightboxImg.naturalWidth *
+            defaultScale;
+
+        const displayHeight =
+            lightboxImg.naturalHeight *
+            defaultScale;
+
+
+        defaultX =
+            (
+                viewportWidth -
+                displayWidth
+            ) / 2;
+
+
+        defaultY =
+            (
+                viewportHeight -
+                displayHeight
+            ) / 2;
+    }
+
+
+
+    /* ============================================================
+       平滑动画
+       ============================================================ */
+
+    function animateTo(
+        targetScale,
+        targetX,
+        targetY,
+        duration =
+            ZOOM_ANIMATION_TIME
+    ) {
+
+        if (
+            animationFrame
+        ) {
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            animationFrame = null;
+        }
+
+
+        const startScale =
+            imageScale;
+
+        const startX =
+            imageX;
+
+        const startY =
+            imageY;
+
+
+        const startTime =
+            performance.now();
+
+
+        function animate(
+            currentTime
+        ) {
+
+            const elapsed =
+                currentTime -
+                startTime;
+
+
+            const progress =
+                Math.min(
+                    elapsed /
+                        duration,
+                    1
+                );
+
+
+            const eased =
+                1 -
+                Math.pow(
+                    1 - progress,
+                    3
+                );
+
+
+            imageScale =
+                startScale +
+                (
+                    targetScale -
+                    startScale
+                ) *
+                eased;
+
+
+            imageX =
+                startX +
+                (
+                    targetX -
+                    startX
+                ) *
+                eased;
+
+
+            imageY =
+                startY +
+                (
+                    targetY -
+                    startY
+                ) *
+                eased;
+
+
+            updateImageTransform();
+
+
+            if (
+                progress < 1
+            ) {
+
+                animationFrame =
+                    requestAnimationFrame(
+                        animate
+                    );
+
+            } else {
+
+                animationFrame =
+                    null;
+
+                imageScale =
+                    targetScale;
+
+                imageX =
+                    targetX;
+
+                imageY =
+                    targetY;
+
+                updateImageTransform();
+            }
+        }
+
+
+        animationFrame =
+            requestAnimationFrame(
+                animate
+            );
+    }
+
+
+
+    /* ============================================================
+       Transform
+       ============================================================ */
+
+    function updateImageTransform() {
+
+        lightboxImg.style.transform =
+            `translate(${imageX}px, ${imageY}px) scale(${imageScale})`;
+    }
+
+
+
+    /* ============================================================
+       恢复默认
+       ============================================================ */
+
+    function resetImageView(
+        animated = false
+    ) {
+
+        calculateDefaultView();
+
+
+        isZoomed = false;
+
+
+        lightbox.classList.remove(
+            'zoomed'
+        );
+
+        lightbox.classList.remove(
+            'dragging'
+        );
+
+
+        if (
+            animationFrame
+        ) {
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            animationFrame = null;
+        }
+
+
+        if (
+            animated
+        ) {
+
+            animateTo(
+
+                defaultScale,
+
+                defaultX,
+
+                defaultY,
+
+                RESET_ANIMATION_TIME
+
+            );
+
+        } else {
+
+            imageScale =
+                defaultScale;
+
+            imageX =
+                defaultX;
+
+            imageY =
+                defaultY;
+
+            updateImageTransform();
+        }
+    }
+
+
+
+    /* ============================================================
+       判断默认视角
+       ============================================================ */
+
+    function isAtDefaultView() {
+
+        return Math.abs(
+            imageScale -
+            defaultScale
+        ) < 0.001;
+    }
+
+
+
+    /* ============================================================
+       缩放
+       ============================================================ */
+
+    function smoothZoomAt(
+        clientX,
+        clientY,
+        targetScale
+    ) {
+
+        if (
+            !lightboxImg.naturalWidth
+        ) {
+
+            return;
+        }
+
+
+        targetScale =
+            Math.max(
+                defaultScale,
+                targetScale
+            );
+
+
+        targetScale =
+            Math.min(
+                MAX_ZOOM,
+                targetScale
+            );
+
+
+        if (
+            targetScale <=
+            defaultScale + 0.0001
+        ) {
+
+            resetImageView(
+                true
+            );
+
+            return;
+        }
+
+
+        const currentScale =
+            imageScale;
+
+
+        const imagePointX =
+            (
+                clientX -
+                imageX
+            ) /
+            currentScale;
+
+
+        const imagePointY =
+            (
+                clientY -
+                imageY
+            ) /
+            currentScale;
+
+
+        const targetX =
+            clientX -
+            imagePointX *
+            targetScale;
+
+
+        const targetY =
+            clientY -
+            imagePointY *
+            targetScale;
+
+
+        isZoomed = true;
+
+
+        lightbox.classList.add(
+            'zoomed'
+        );
+
+
+        animateTo(
+
+            targetScale,
+
+            targetX,
+
+            targetY,
+
+            ZOOM_ANIMATION_TIME
+        );
+    }
+
+
+
+    /* ============================================================
+       鼠标滚轮
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'wheel',
+        (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            if (
+                e.deltaY < 0
+            ) {
+
+                const targetScale =
+                    imageScale *
+                    WHEEL_ZOOM_IN;
+
+
+                smoothZoomAt(
+
+                    e.clientX,
+                    e.clientY,
+                    targetScale
+                );
+
+            } else {
+
+                const targetScale =
+                    imageScale /
+                    WHEEL_ZOOM_IN;
+
+
+                if (
+                    targetScale <=
+                    defaultScale + 0.001
+                ) {
+
+                    resetImageView(
+                        true
+                    );
+
+                } else {
+
+                    smoothZoomAt(
+
+                        e.clientX,
+                        e.clientY,
+                        targetScale
+                    );
+                }
+            }
+
+        },
+        {
+            passive: false
+        }
+    );
+
+
+
+    /* ============================================================
+       鼠标点击
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'click',
+        (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            if (
+                lastTouchWasPinch &&
+                Date.now() -
+                touchEndTime <
+                350
+            ) {
+
+                lastTouchWasPinch =
+                    false;
 
                 return;
             }
 
 
-            zoomAtPoint(
-                pinchCenterX,
-                pinchCenterY,
-                newScale
+            lastTouchWasPinch =
+                false;
+
+
+            if (
+                hasDragged
+            ) {
+
+                hasDragged =
+                    false;
+
+                return;
+            }
+
+
+            if (
+                !isZoomed ||
+                isAtDefaultView()
+            ) {
+
+                const targetScale =
+                    Math.min(
+
+                        MAX_ZOOM,
+
+                        defaultScale *
+                        CLICK_ZOOM
+
+                    );
+
+
+                smoothZoomAt(
+
+                    e.clientX,
+                    e.clientY,
+                    targetScale
+                );
+
+
+                return;
+            }
+
+
+            resetImageView(
+                true
             );
-
-
-            return;
         }
+    );
 
 
-        /*
-           单指
-        */
 
-        if (
-            event.touches.length !== 1
-        ) return;
+    /* ============================================================
+       鼠标拖动开始
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'mousedown',
+        (e) => {
+
+            if (
+                e.button !== 0
+            ) {
+
+                return;
+            }
 
 
-        const touch =
-            event.touches[0];
+            if (
+                !isZoomed ||
+                isAtDefaultView()
+            ) {
 
+                return;
+            }
+
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            if (
+                animationFrame
+            ) {
+
+                cancelAnimationFrame(
+                    animationFrame
+                );
+
+                animationFrame = null;
+            }
+
+
+            isDragging = true;
+
+            hasDragged = false;
+
+
+            dragStartX =
+                e.clientX;
+
+            dragStartY =
+                e.clientY;
+
+
+            dragImageStartX =
+                imageX;
+
+            dragImageStartY =
+                imageY;
+
+
+            lightbox.classList.add(
+                'dragging'
+            );
+        }
+    );
+
+
+
+    /* ============================================================
+       鼠标移动
+       ============================================================ */
+
+    document.addEventListener(
+        'mousemove',
+        (e) => {
+
+            if (
+                !isDragging
+            ) {
+
+                return;
+            }
+
+
+            const deltaX =
+                e.clientX -
+                dragStartX;
+
+            const deltaY =
+                e.clientY -
+                dragStartY;
+
+
+            if (
+                Math.abs(deltaX) >
+                    DRAG_THRESHOLD ||
+                Math.abs(deltaY) >
+                    DRAG_THRESHOLD
+            ) {
+
+                hasDragged = true;
+            }
+
+
+            imageX =
+                dragImageStartX +
+                deltaX;
+
+            imageY =
+                dragImageStartY +
+                deltaY;
+
+
+            updateImageTransform();
+        }
+    );
+
+
+
+    /* ============================================================
+       鼠标结束
+       ============================================================ */
+
+    document.addEventListener(
+        'mouseup',
+        () => {
+
+            if (
+                !isDragging
+            ) {
+
+                return;
+            }
+
+
+            isDragging = false;
+
+
+            lightbox.classList.remove(
+                'dragging'
+            );
+        }
+    );
+
+
+
+    /* ============================================================
+       双击
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'dblclick',
+        (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    );
+
+
+
+    /* ============================================================
+       触控辅助函数
+       ============================================================ */
+
+    function getTouchDistance(
+        touch1,
+        touch2
+    ) {
 
         const dx =
-            touch.clientX -
-            touchLastX;
+            touch2.clientX -
+            touch1.clientX;
 
         const dy =
-            touch.clientY -
-            touchLastY;
+            touch2.clientY -
+            touch1.clientY;
 
 
-        const totalDx =
-            touch.clientX -
-            touchStartX;
-
-        const totalDy =
-            touch.clientY -
-            touchStartY;
-
-
-        if (
-            Math.abs(totalDx) > 8 ||
-            Math.abs(totalDy) > 8
-        ) {
-
-            touchMoved =
-                true;
-        }
-
-
-        /*
-           如果已经放大：
-           单指拖动图片
-        */
-
-        if (
-            targetScale > 1.01
-        ) {
-
-            event.preventDefault();
-
-
-            targetX += dx;
-
-            targetY += dy;
-
-
-            translateX =
-                targetX;
-
-            translateY =
-                targetY;
-
-            zoomScale =
-                targetScale;
-
-
-            applyTransform();
-
-        }
-
-
-        touchLastX =
-            touch.clientX;
-
-        touchLastY =
-            touch.clientY;
-
-    },
-    {
-        passive: false
+        return Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
     }
-);
+
+
+    function getTouchCenter(
+        touch1,
+        touch2
+    ) {
+
+        return {
+
+            x:
+                (
+                    touch1.clientX +
+                    touch2.clientX
+                ) / 2,
+
+            y:
+                (
+                    touch1.clientY +
+                    touch2.clientY
+                ) / 2
+
+        };
+    }
 
 
 
-/*
-   TOUCH END
-*/
+    /* ============================================================
+       手机触控开始
+       ============================================================ */
 
-lightboxStage.addEventListener(
-    "touchend",
-    event => {
+    lightboxImg.addEventListener(
+        'touchstart',
+        (e) => {
 
-        /*
-           如果是单指滑动，并且没有放大，
-           判断左右滑动切换图片。
-        */
+            /*
+             * 两指
+             */
 
-        if (
-            touchMode === "single" &&
-            event.touches.length === 0
-        ) {
+            if (
+                e.touches.length === 2
+            ) {
 
-            const dx =
-                touchLastX -
-                touchStartX;
+                e.preventDefault();
+                e.stopPropagation();
 
-            const dy =
-                touchLastY -
-                touchStartY;
+
+                if (
+                    animationFrame
+                ) {
+
+                    cancelAnimationFrame(
+                        animationFrame
+                    );
+
+                    animationFrame = null;
+                }
+
+
+                isPinching = true;
+
+                isTouching = false;
+
+
+                const touch1 =
+                    e.touches[0];
+
+                const touch2 =
+                    e.touches[1];
+
+
+                pinchStartDistance =
+                    getTouchDistance(
+                        touch1,
+                        touch2
+                    );
+
+
+                pinchStartScale =
+                    imageScale;
+
+
+                const center =
+                    getTouchCenter(
+                        touch1,
+                        touch2
+                    );
+
+
+                pinchCenterX =
+                    center.x;
+
+                pinchCenterY =
+                    center.y;
+
+
+                pinchImagePointX =
+                    (
+                        pinchCenterX -
+                        imageX
+                    ) /
+                    pinchStartScale;
+
+
+                pinchImagePointY =
+                    (
+                        pinchCenterY -
+                        imageY
+                    ) /
+                    pinchStartScale;
+
+
+                isZoomed = true;
+
+
+                lightbox.classList.add(
+                    'zoomed'
+                );
+
+
+                return;
+            }
 
 
             /*
-               横向滑动距离必须明显
-            */
+             * 单指
+             */
 
             if (
-                Math.abs(dx) > 60 &&
-                Math.abs(dx) >
-                    Math.abs(dy) * 1.2 &&
-                zoomScale <= 1.01
+                e.touches.length === 1
             ) {
 
-                if (dx < 0) {
+                const touch =
+                    e.touches[0];
 
-                    showNext();
+
+                isTouching = true;
+
+                touchMoved = false;
+
+
+                touchStartX =
+                    touch.clientX;
+
+                touchStartY =
+                    touch.clientY;
+
+
+                touchLastX =
+                    touch.clientX;
+
+                touchLastY =
+                    touch.clientY;
+
+
+                lastTouchWasPinch =
+                    false;
+            }
+
+        },
+        {
+            passive: false
+        }
+    );
+
+
+
+    /* ============================================================
+       手机触控移动
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'touchmove',
+        (e) => {
+
+            /*
+             * ====================================================
+             * 两指缩放
+             * ====================================================
+             */
+
+            if (
+                isPinching &&
+                e.touches.length === 2
+            ) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+
+                const touch1 =
+                    e.touches[0];
+
+                const touch2 =
+                    e.touches[1];
+
+
+                const currentDistance =
+                    getTouchDistance(
+                        touch1,
+                        touch2
+                    );
+
+
+                if (
+                    pinchStartDistance <= 0
+                ) {
+
+                    return;
+                }
+
+
+                let targetScale =
+                    pinchStartScale *
+                    (
+                        currentDistance /
+                        pinchStartDistance
+                    );
+
+
+                targetScale =
+                    Math.max(
+                        defaultScale,
+                        targetScale
+                    );
+
+
+                targetScale =
+                    Math.min(
+                        MAX_ZOOM,
+                        targetScale
+                    );
+
+
+                const center =
+                    getTouchCenter(
+                        touch1,
+                        touch2
+                    );
+
+
+                pinchCenterX =
+                    center.x;
+
+                pinchCenterY =
+                    center.y;
+
+
+                imageScale =
+                    targetScale;
+
+
+                imageX =
+                    pinchCenterX -
+                    pinchImagePointX *
+                    targetScale;
+
+
+                imageY =
+                    pinchCenterY -
+                    pinchImagePointY *
+                    targetScale;
+
+
+                updateImageTransform();
+
+
+                if (
+                    imageScale <=
+                    defaultScale + 0.001
+                ) {
+
+                    isZoomed = false;
+
+                    lightbox.classList.remove(
+                        'zoomed'
+                    );
 
                 } else {
 
-                    showPrevious();
+                    isZoomed = true;
+
+                    lightbox.classList.add(
+                        'zoomed'
+                    );
                 }
 
+
+                return;
             }
 
+
+            /*
+             * ====================================================
+             * 单指
+             * ====================================================
+             */
+
+            if (
+                !isTouching ||
+                e.touches.length !== 1
+            ) {
+
+                return;
+            }
+
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            const touch =
+                e.touches[0];
+
+
+            const currentX =
+                touch.clientX;
+
+            const currentY =
+                touch.clientY;
+
+
+            const totalDeltaX =
+                currentX -
+                touchStartX;
+
+            const totalDeltaY =
+                currentY -
+                touchStartY;
+
+
+            if (
+                Math.abs(totalDeltaX) >
+                    TOUCH_MOVE_THRESHOLD ||
+                Math.abs(totalDeltaY) >
+                    TOUCH_MOVE_THRESHOLD
+            ) {
+
+                touchMoved = true;
+            }
+
+
+            /*
+             * 放大状态：
+             *
+             * 单指平移
+             */
+
+            if (
+                isZoomed &&
+                !isAtDefaultView()
+            ) {
+
+                if (
+                    animationFrame
+                ) {
+
+                    cancelAnimationFrame(
+                        animationFrame
+                    );
+
+                    animationFrame = null;
+                }
+
+
+                const deltaX =
+                    currentX -
+                    touchLastX;
+
+                const deltaY =
+                    currentY -
+                    touchLastY;
+
+
+                imageX +=
+                    deltaX;
+
+                imageY +=
+                    deltaY;
+
+
+                updateImageTransform();
+
+
+                touchLastX =
+                    currentX;
+
+                touchLastY =
+                    currentY;
+
+
+                return;
+            }
+
+
+            /*
+             * 默认状态：
+             *
+             * 这里只记录手指移动。
+             *
+             * touchend 时才切图。
+             */
+
+            touchLastX =
+                currentX;
+
+            touchLastY =
+                currentY;
+
+        },
+        {
+            passive: false
         }
+    );
 
 
-        /*
-           双指结束后，如果缩放很小，
-           自动恢复默认状态。
-        */
+
+    /* ============================================================
+       手机触控结束
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'touchend',
+        (e) => {
+
+            /*
+             * ====================================================
+             * 两指缩放结束
+             * ====================================================
+             */
+
+            if (
+                isPinching
+            ) {
+
+                if (
+                    e.touches.length >= 2
+                ) {
+
+                    return;
+                }
+
+
+                isPinching = false;
+
+
+                lastTouchWasPinch =
+                    true;
+
+                touchEndTime =
+                    Date.now();
+
+
+                if (
+                    imageScale <=
+                    defaultScale + 0.001
+                ) {
+
+                    resetImageView(
+                        true
+                    );
+
+                } else {
+
+                    isZoomed = true;
+
+                    lightbox.classList.add(
+                        'zoomed'
+                    );
+                }
+
+
+                return;
+            }
+
+
+            /*
+             * ====================================================
+             * 单指结束
+             * ====================================================
+             */
+
+            if (
+                !isTouching
+            ) {
+
+                return;
+            }
+
+
+            isTouching = false;
+
+
+            if (
+                touchMoved
+            ) {
+
+                /*
+                 * ----------------------------------------------
+                 * 放大状态
+                 * ----------------------------------------------
+                 */
+
+                if (
+                    isZoomed &&
+                    !isAtDefaultView()
+                ) {
+
+                    hasDragged = true;
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------
+                 * 默认状态：
+                 * 左右滑动切换图片
+                 * ----------------------------------------------
+                 */
+
+                const deltaX =
+                    e.changedTouches[0]
+                        .clientX -
+                    touchStartX;
+
+
+                const deltaY =
+                    e.changedTouches[0]
+                        .clientY -
+                    touchStartY;
+
+
+                if (
+                    Math.abs(deltaX) >
+                        SWIPE_THRESHOLD &&
+                    Math.abs(deltaX) >
+                        Math.abs(deltaY) *
+                        1.2
+                ) {
+
+                    if (
+                        deltaX < 0
+                    ) {
+
+                        /*
+                         * 向左滑：
+                         * 下一张
+                         *
+                         * 图片从右侧滑入
+                         */
+
+                        nextImage(true);
+
+                    } else {
+
+                        /*
+                         * 向右滑：
+                         * 上一张
+                         *
+                         * 图片从左侧滑入
+                         */
+
+                        previousImage(true);
+                    }
+                }
+
+
+                /*
+                 * 阻止后续 click。
+                 */
+
+                hasDragged = true;
+
+                return;
+            }
+
+        },
+        {
+            passive: false
+        }
+    );
+
+
+
+    /* ============================================================
+       手机触控取消
+       ============================================================ */
+
+    lightboxImg.addEventListener(
+        'touchcancel',
+        () => {
+
+            isTouching = false;
+
+            isPinching = false;
+
+            touchMoved = false;
+
+            lastTouchWasPinch = true;
+
+            touchEndTime =
+                Date.now();
+
+
+            if (
+                imageScale <=
+                defaultScale + 0.001
+            ) {
+
+                resetImageView(
+                    true
+                );
+            }
+        }
+    );
+
+
+
+    /* ============================================================
+       窗口尺寸变化
+       ============================================================ */
+
+    window.addEventListener(
+        'resize',
+        () => {
+
+            if (
+                !lightbox.classList.contains(
+                    'active'
+                )
+            ) {
+
+                return;
+            }
+
+
+            resetImageView(
+                false
+            );
+        }
+    );
+
+
+
+    /* ============================================================
+       下一张
+       ============================================================ */
+
+    function nextImage(
+        withAnimation = false
+    ) {
+
+        showImage(
+
+            currentImageIndex + 1,
+
+            withAnimation
+                ? 'next'
+                : null
+
+        );
+    }
+
+
+
+    /* ============================================================
+       上一张
+       ============================================================ */
+
+    function previousImage(
+        withAnimation = false
+    ) {
+
+        showImage(
+
+            currentImageIndex - 1,
+
+            withAnimation
+                ? 'prev'
+                : null
+
+        );
+    }
+
+
+
+    /* ============================================================
+       关闭
+       ============================================================ */
+
+    function closeLightbox() {
+
+        lightbox.classList.remove(
+            'active'
+        );
+
+        lightbox.classList.remove(
+            'zoomed'
+        );
+
+        lightbox.classList.remove(
+            'dragging'
+        );
+
+        lightbox.classList.remove(
+            'slide-next'
+        );
+
+        lightbox.classList.remove(
+            'slide-prev'
+        );
+
+
+        isDragging = false;
+
+        isPinching = false;
+
+        isTouching = false;
+
+        isZoomed = false;
+
+        hasDragged = false;
+
+        touchMoved = false;
+
+        lastTouchWasPinch = false;
+
 
         if (
-            targetScale <= 1.01
+            animationFrame
         ) {
 
-            resetZoom(true);
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+            animationFrame = null;
         }
 
 
-        touchMode =
-            null;
+        document.body.style.overflow =
+            'auto';
 
+
+        if (
+            document.fullscreenElement
+        ) {
+
+            document
+                .exitFullscreen()
+                .catch(
+                    () => {}
+                );
+        }
     }
-);
 
 
 
-/* =========================================================
-   8. FULLSCREEN
-========================================================= */
+    /* ============================================================
+       全屏
+       ============================================================ */
 
-fullscreenBtn.addEventListener(
-    "click",
-    async event => {
+    async function toggleFullscreen(e) {
 
-        event.stopPropagation();
+        if (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
 
         try {
@@ -3140,397 +3460,336 @@ fullscreenBtn.addEventListener(
             } else {
 
                 await document.exitFullscreen();
-
             }
 
         } catch (error) {
 
             console.log(
-                "Fullscreen unavailable:",
+                'Fullscreen error:',
                 error
             );
         }
-
     }
-);
 
 
-/*
-   全屏状态变化时更新按钮
-*/
 
-document.addEventListener(
-    "fullscreenchange",
-    () => {
+    /* ============================================================
+       全屏状态
+       ============================================================ */
 
-        if (
-            document.fullscreenElement
-        ) {
+    document.addEventListener(
+        'fullscreenchange',
+        () => {
 
-            fullscreenBtn.textContent =
-                "×";
+            if (
+                !lightbox.classList.contains(
+                    'active'
+                )
+            ) {
 
-            fullscreenBtn.title =
-                "退出全屏";
+                return;
+            }
 
-        } else {
 
-            fullscreenBtn.textContent =
-                "⛶";
+            setTimeout(
+                () => {
 
-            fullscreenBtn.title =
-                "Fullscreen";
+                    resetImageView(
+                        false
+                    );
+
+                },
+                50
+            );
         }
-
-    }
-);
+    );
 
 
 
-/* =========================================================
-   9. DOWNLOAD
-========================================================= */
+    /* ============================================================
+       全屏图标
+       ============================================================ */
 
-downloadBtn.addEventListener(
-    "click",
-    async event => {
+    document.addEventListener(
+        'fullscreenchange',
+        () => {
 
-        event.stopPropagation();
-
-
-        const data =
-            galleryImages[
-                currentImageIndex
-            ];
-
-
-        if (!data) return;
-
-
-        try {
-
-            const response =
-                await fetch(data.src);
-
-
-            const blob =
-                await response.blob();
-
-
-            const url =
-                URL.createObjectURL(
-                    blob
+            const icon =
+                document.getElementById(
+                    'fullscreen-icon'
                 );
 
 
-            const link =
-                document.createElement(
-                    "a"
-                );
+            if (!icon) {
+                return;
+            }
 
-
-            link.href =
-                url;
-
-
-            /*
-               从图片文件名生成下载文件名
-            */
-
-            const originalName =
-                data.src
-                    .split("/")
-                    .pop()
-                    .split("?")[0];
-
-
-            link.download =
-                originalName ||
-                "TJ-ART.jpg";
-
-
-            document.body.appendChild(
-                link
-            );
-
-
-            link.click();
-
-
-            link.remove();
-
-
-            URL.revokeObjectURL(
-                url
-            );
-
-        } catch (error) {
-
-            /*
-               如果浏览器因为本地文件、
-               GitHub 跨域等原因阻止 fetch，
-               使用普通链接下载。
-            */
-
-            const link =
-                document.createElement(
-                    "a"
-                );
-
-
-            link.href =
-                data.src;
-
-            link.download =
-                data.src
-                    .split("/")
-                    .pop();
-
-
-            link.target =
-                "_blank";
-
-
-            document.body.appendChild(
-                link
-            );
-
-
-            link.click();
-
-            link.remove();
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   10. KEYBOARD
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        /*
-           ESC
-        */
-
-        if (
-            event.key === "Escape"
-        ) {
 
             if (
                 document.fullscreenElement
             ) {
 
-                document.exitFullscreen();
+                icon.innerHTML = `
 
-            } else if (
-                lightbox.classList.contains(
-                    "open"
+                    <path d="M9 3H3v6"></path>
+                    <path d="M15 3h6v6"></path>
+                    <path d="M9 21H3v-6"></path>
+                    <path d="M15 21h6v-6"></path>
+
+                `;
+
+            } else {
+
+                icon.innerHTML = `
+
+                    <path d="M8 3H3v5"></path>
+                    <path d="M16 3h5v5"></path>
+                    <path d="M8 21H3v-5"></path>
+                    <path d="M16 21h5v-5"></path>
+
+                `;
+            }
+        }
+    );
+
+
+
+    /* ============================================================
+       下载
+       ============================================================ */
+
+    function downloadCurrentImage(e) {
+
+        if (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+
+        const currentItem =
+            galleryItems[
+                currentImageIndex
+            ];
+
+
+        if (!currentItem) {
+            return;
+        }
+
+
+        const img =
+            currentItem.querySelector(
+                'img'
+            );
+
+
+        if (!img) {
+            return;
+        }
+
+
+        const link =
+            document.createElement(
+                'a'
+            );
+
+
+        link.href =
+            img.src;
+
+
+        const sourceName =
+            img.src
+                .split('/')
+                .pop()
+                .split('?')[0];
+
+
+        link.download =
+            sourceName ||
+            'T.J.ART.jpg';
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        document.body.removeChild(
+            link
+        );
+    }
+
+
+
+    /* ============================================================
+       键盘
+       ============================================================ */
+
+    document.addEventListener(
+        'keydown',
+        (e) => {
+
+            if (
+                !lightbox.classList.contains(
+                    'active'
                 )
+            ) {
+
+                return;
+            }
+
+
+            if (
+                e.key === 'Escape'
             ) {
 
                 closeLightbox();
+            }
 
-            } else if (
+
+            if (
+                e.key === 'ArrowRight'
+            ) {
+
+                nextImage(false);
+            }
+
+
+            if (
+                e.key === 'ArrowLeft'
+            ) {
+
+                previousImage(false);
+            }
+
+        }
+    );
+
+
+
+    /* ============================================================
+       4. ABOUT
+       ============================================================ */
+
+    const aboutLink =
+        document.getElementById(
+            'about-link'
+        );
+
+    const aboutOverlay =
+        document.getElementById(
+            'about-overlay'
+        );
+
+    const aboutBack =
+        document.getElementById(
+            'about-back'
+        );
+
+
+    let savedScrollPosition = 0;
+
+
+    function openAbout(e) {
+
+        if (e) {
+            e.preventDefault();
+        }
+
+
+        savedScrollPosition =
+            window.scrollY;
+
+
+        aboutOverlay.classList.add(
+            'active'
+        );
+
+
+        aboutOverlay.setAttribute(
+            'aria-hidden',
+            'false'
+        );
+
+
+        document.body.classList.add(
+            'about-open'
+        );
+    }
+
+
+    function closeAbout() {
+
+        aboutOverlay.classList.remove(
+            'active'
+        );
+
+
+        aboutOverlay.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+
+        document.body.classList.remove(
+            'about-open'
+        );
+
+
+        window.scrollTo(
+            0,
+            savedScrollPosition
+        );
+    }
+
+
+    if (
+        aboutLink
+    ) {
+
+        aboutLink.addEventListener(
+            'click',
+            openAbout
+        );
+    }
+
+
+    if (
+        aboutBack
+    ) {
+
+        aboutBack.addEventListener(
+            'click',
+            closeAbout
+        );
+    }
+
+
+    document.addEventListener(
+        'keydown',
+        (e) => {
+
+            if (
+                aboutOverlay &&
                 aboutOverlay.classList.contains(
-                    "open"
-                )
+                    'active'
+                ) &&
+                e.key === 'Escape'
             ) {
 
                 closeAbout();
-
             }
-
-        }
-
-
-        /*
-           左右箭头
-        */
-
-        if (
-            lightbox.classList.contains(
-                "open"
-            )
-        ) {
-
-            if (
-                event.key === "ArrowLeft"
-            ) {
-
-                showPrevious();
-
-            }
-
-            if (
-                event.key === "ArrowRight"
-            ) {
-
-                showNext();
-
-            }
-
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   11. ABOUT
-========================================================= */
-
-const aboutLink =
-    document.getElementById(
-        "aboutLink"
-    );
-
-const aboutOverlay =
-    document.getElementById(
-        "aboutOverlay"
-    );
-
-const aboutClose =
-    document.getElementById(
-        "aboutClose"
-    );
-
-
-function openAbout(event) {
-
-    if (event)
-        event.preventDefault();
-
-
-    aboutOverlay.classList.add(
-        "open"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-}
-
-
-function closeAbout() {
-
-    aboutOverlay.classList.remove(
-        "open"
-    );
-
-
-    document.body.style.overflow =
-        "";
-}
-
-
-aboutLink.addEventListener(
-    "click",
-    openAbout
-);
-
-
-aboutClose.addEventListener(
-    "click",
-    closeAbout
-);
-
-
-aboutOverlay.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            aboutOverlay
-        ) {
-
-            closeAbout();
-
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   12. LOGO HOME
-========================================================= */
-
-document
-    .getElementById("logoHome")
-    .addEventListener(
-        "click",
-        event => {
-
-            event.preventDefault();
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-
         }
     );
 
-
-
-/* =========================================================
-   13. STOP SLIDESHOW WHEN TAB IS HIDDEN
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    () => {
-
-        if (
-            document.hidden
-        ) {
-
-            clearInterval(
-                slideshowTimer
-            );
-
-        } else {
-
-            clearInterval(
-                slideshowTimer
-            );
-
-
-            slideshowTimer =
-                setInterval(
-                    nextSlide,
-                    INTERVAL_TIME
-                );
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   14. INITIAL HERO HEIGHT AFTER EVERYTHING LOADS
-========================================================= */
-
-window.addEventListener(
-    "load",
-    () => {
-
-        updateHeroHeight();
-
-    }
-);
 
 </script>
+
 
 </body>
 </html>
