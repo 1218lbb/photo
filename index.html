@@ -247,24 +247,24 @@
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
         const INTERVAL_TIME = 5000;
+        
         function nextSlide() {
+            if (slides.length === 0) return;
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
         }
-        setInterval(nextSlide, INTERVAL_TIME);
+        
+        // 只有当存在幻灯片时才启动定时器
+        if (slides.length > 0) {
+            setInterval(nextSlide, INTERVAL_TIME);
+        }
 
         // --- 2. 导航栏滚动渐变逻辑 ---
         const nav = document.querySelector('nav');
         const heroSection = document.querySelector('.hero-slideshow');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > heroSection.offsetHeight - 100) {
+            if (heroSection && window.scrollY > heroSection.offsetHeight - 100) {
                 nav.classList.add('scrolled');
             } else {
                 nav.classList.remove('scrolled');
-            }
-        });
-
-        // --- 3. 增强版图片放大与播放逻辑 ---
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
