@@ -120,7 +120,6 @@
             display: block;
         }
 
-        /* 底部渐隐层 */
         .slide::after {
             content: '';
             position: absolute;
@@ -247,12 +246,14 @@
             display: block;
             object-fit: cover;
             transition: transform 0.6s ease, filter 0.6s ease;
-            filter: brightness(0.9);
+            /* 移除默认压暗：brightness(0.9) → 1 */
+            filter: brightness(1);
         }
 
         .gallery-item:hover img {
             transform: scale(1.08);
-            filter: brightness(1.1);
+            /* 悬停时微微提亮，制造呼吸感 */
+            filter: brightness(1.05);
         }
 
         .overlay {
@@ -296,7 +297,7 @@
             line-height: 1.5;
         }
 
-        /* --- 6. 图片放大预览 --- */
+        /* --- 6. 图片放大预览 (支持缩放) --- */
         .lightbox {
             display: none;
             position: fixed;
@@ -308,20 +309,53 @@
             background-color: rgba(0, 0, 0, 0.98);
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .lightbox.active {
             display: flex;
         }
 
+        .lightbox-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .lightbox-wrapper:active {
+            cursor: grabbing;
+        }
+
         .lightbox img {
+            display: block;
+            object-fit: contain;
             max-width: 90%;
             max-height: 90vh;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            object-fit: contain;
+            transition: none;
+            transform-origin: 0 0;
+            will-change: transform;
+            /* 默认缩放为1，由JS控制 */
+            transform: scale(1) translate(0, 0);
+            /* 初始位置由JS计算居中 */
+            position: relative;
+            left: 0;
+            top: 0;
         }
 
-        /* 返回箭头 - 样式与 ABOUT 的 BACK 一致 */
+        /* 当图片实际像素小于容器时，使用点对点显示（由JS设置object-fit: none） */
+        .lightbox img.pixel-perfect {
+            object-fit: none;
+            max-width: none;
+            max-height: none;
+            image-rendering: auto;
+        }
+
         .lightbox-back {
             position: absolute;
             top: 30px;
@@ -371,6 +405,21 @@
 
         .lightbox-next {
             right: 25px;
+        }
+
+        /* 缩放提示 (可选) */
+        .zoom-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: 300;
+            pointer-events: none;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
         }
 
         /* --- 7. ABOUT 全屏黑色界面 --- */
@@ -538,6 +587,10 @@
                 left: 25px;
                 font-size: 11px;
             }
+
+            .zoom-hint {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -555,7 +608,6 @@
     <!-- 全屏幻灯片展览 -->
     <div class="hero-slideshow">
 
-        <!-- 幻灯片 1 -->
         <div class="slide active">
             <img src="Wilderness.jpg" alt="作品1">
             <div class="slide-caption">
@@ -564,7 +616,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 2 -->
         <div class="slide">
             <img src="AThousandTowers.jpg" alt="作品2">
             <div class="slide-caption">
@@ -573,7 +624,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 3 -->
         <div class="slide">
             <img src="3AWorldofWhite.jpg" alt="作品3">
             <div class="slide-caption">
@@ -582,7 +632,6 @@
             </div>
         </div>
 
-        <!-- 幻灯片 4 -->
         <div class="slide">
             <img src="TheDepths.jpg" alt="作品5">
             <div class="slide-caption">
@@ -732,22 +781,24 @@
         </div>
     </section>
 
-    <!-- 图片放大预览框 -->
+    <!-- 图片放大预览框 (带缩放) -->
     <div id="lightbox" class="lightbox">
 
-        <!-- 返回箭头 (与 ABOUT 的 BACK 样式一致) -->
         <button class="lightbox-back" onclick="closeLightbox()">← BACK</button>
 
         <button class="lightbox-prev" onclick="event.stopPropagation(); previousImage()" aria-label="上一张">
             ‹
         </button>
 
-        <img id="lightbox-img" src="" alt="Preview">
+        <div class="lightbox-wrapper" id="lightboxWrapper">
+            <img id="lightbox-img" src="" alt="Preview">
+        </div>
 
         <button class="lightbox-next" onclick="event.stopPropagation(); nextImage()" aria-label="下一张">
             ›
         </button>
 
+        <div class="zoom-hint" id="zoomHint">滚轮缩放 · 拖动平移</div>
     </div>
 
     <!-- ABOUT 全屏黑色界面 -->
@@ -816,39 +867,166 @@
         });
 
 
-        /* --- 3. 图片放大与切换逻辑 --- */
+        /* --- 3. 图片放大 + 缩放 + 平移 --- */
         const lightbox = document.getElementById('lightbox');
+        const lightboxWrapper = document.getElementById('lightboxWrapper');
         const lightboxImg = document.getElementById('lightbox-img');
+        const zoomHint = document.getElementById('zoomHint');
 
-        const galleryItems = Array.from(
-            document.querySelectorAll('.gallery-item')
-        );
-
+        const galleryItems = Array.from(document.querySelectorAll('.gallery-item'));
         let currentImageIndex = 0;
+
+        // 缩放与平移状态
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let startTranslateX = 0;
+        let startTranslateY = 0;
+
+        // 重置变换
+        function resetTransform() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            applyTransform();
+        }
+
+        // 应用变换到图片
+        function applyTransform() {
+            // 限制平移范围，防止图片移出视野
+            const img = lightboxImg;
+            const rect = img.getBoundingClientRect();
+            const containerRect = lightboxWrapper.getBoundingClientRect();
+
+            // 计算图片实际显示尺寸 (考虑缩放)
+            const imgWidth = img.naturalWidth * scale;
+            const imgHeight = img.naturalHeight * scale;
+
+            // 如果图片是点对点模式 (pixel-perfect)，尺寸不同
+            const isPixelPerfect = img.classList.contains('pixel-perfect');
+            const displayWidth = isPixelPerfect ? img.naturalWidth * scale : imgWidth;
+            const displayHeight = isPixelPerfect ? img.naturalHeight * scale : imgHeight;
+
+            // 计算最大平移量，确保图片不超出容器太多
+            const maxTx = Math.max(0, (displayWidth - containerRect.width) / 2);
+            const maxTy = Math.max(0, (displayHeight - containerRect.height) / 2);
+
+            // 如果缩放小于1，不允许平移 (图片小于容器)
+            if (scale <= 1 && !isPixelPerfect) {
+                translateX = 0;
+                translateY = 0;
+            } else {
+                translateX = Math.max(-maxTx, Math.min(maxTx, translateX));
+                translateY = Math.max(-maxTy, Math.min(maxTy, translateY));
+            }
+
+            img.style.transform = `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`;
+            img.style.transformOrigin = '0 0';
+        }
+
+        // 居中图片 (在容器内)
+        function centerImage() {
+            const img = lightboxImg;
+            const containerRect = lightboxWrapper.getBoundingClientRect();
+
+            // 等待图片加载完成
+            if (!img.complete) {
+                img.addEventListener('load', centerImage, { once: true });
+                return;
+            }
+
+            const imgNaturalWidth = img.naturalWidth;
+            const imgNaturalHeight = img.naturalHeight;
+
+            // 判断图片像素是否足以铺满屏幕
+            const screenWidth = window.innerWidth * 0.9;
+            const screenHeight = window.innerHeight * 0.9;
+
+            // 如果图片实际像素小于屏幕尺寸，使用点对点 (1:1)
+            if (imgNaturalWidth <= screenWidth && imgNaturalHeight <= screenHeight) {
+                img.classList.add('pixel-perfect');
+                // 点对点模式下，缩放为1，并且居中
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                applyTransform();
+                // 用CSS居中
+                img.style.position = 'relative';
+                img.style.left = '50%';
+                img.style.top = '50%';
+                img.style.transform = `translate(-50%, -50%) scale(1)`;
+                // 重置transform-origin
+                img.style.transformOrigin = 'center center';
+                // 禁用平移拖拽
+                return;
+            } else {
+                img.classList.remove('pixel-perfect');
+                // 使用contain适配
+                img.style.position = 'relative';
+                img.style.left = '0';
+                img.style.top = '0';
+                img.style.transformOrigin = '0 0';
+
+                // 计算适合的缩放
+                const scaleX = screenWidth / imgNaturalWidth;
+                const scaleY = screenHeight / imgNaturalHeight;
+                scale = Math.min(scaleX, scaleY, 1);
+                translateX = 0;
+                translateY = 0;
+                applyTransform();
+                // 居中显示 (通过translate)
+                const containerW = containerRect.width;
+                const containerH = containerRect.height;
+                const displayW = imgNaturalWidth * scale;
+                const displayH = imgNaturalHeight * scale;
+                translateX = (containerW - displayW) / 2 / scale;
+                translateY = (containerH - displayH) / 2 / scale;
+                applyTransform();
+            }
+        }
+
+        // 更新图片显示
+        function showImage(index) {
+            if (index < 0) index = galleryItems.length - 1;
+            if (index >= galleryItems.length) index = 0;
+            currentImageIndex = index;
+
+            const item = galleryItems[currentImageIndex];
+            const img = item.querySelector('img');
+
+            // 重置缩放状态
+            resetTransform();
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+
+            // 图片加载完成后居中
+            if (lightboxImg.complete) {
+                centerImage();
+            } else {
+                lightboxImg.addEventListener('load', centerImage, { once: true });
+            }
+
+            // 显示提示
+            zoomHint.style.opacity = '0.6';
+            setTimeout(() => {
+                zoomHint.style.opacity = '0';
+            }, 3000);
+        }
 
         function openLightbox(element) {
             currentImageIndex = galleryItems.indexOf(element);
             showImage(currentImageIndex);
-
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        function showImage(index) {
-            if (index < 0) {
-                index = galleryItems.length - 1;
-            }
-
-            if (index >= galleryItems.length) {
-                index = 0;
-            }
-
-            currentImageIndex = index;
-
-            const img = galleryItems[currentImageIndex].querySelector('img');
-
-            lightboxImg.src = img.src;
-            lightboxImg.alt = img.alt;
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetTransform();
         }
 
         function nextImage() {
@@ -859,69 +1037,65 @@
             showImage(currentImageIndex - 1);
         }
 
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
+        // --- 鼠标滚轮缩放 (以鼠标位置为中心) ---
+        lightboxWrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
 
-        // 点击黑色背景不再关闭
-        // lightbox.addEventListener('click', (e) => {
-        //     if (e.target === lightbox) {
-        //         closeLightbox();
-        //     }
-        // });
+            // 点对点模式下禁用缩放
+            if (lightboxImg.classList.contains('pixel-perfect')) return;
 
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newScale = Math.min(Math.max(0.2, scale + delta), 5);
 
-            if (e.key === 'Escape') {
-                closeLightbox();
-            }
+            if (newScale === scale) return;
 
-            if (e.key === 'ArrowRight') {
-                nextImage();
-            }
+            // 计算鼠标位置相对于图片的比例
+            const rect = lightboxImg.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const ratioX = mouseX / rect.width;
+            const ratioY = mouseY / rect.height;
 
-            if (e.key === 'ArrowLeft') {
-                previousImage();
-            }
-        });
+            // 更新缩放
+            scale = newScale;
 
+            // 调整平移以保持鼠标位置不变
+            // 新的缩放后，图片尺寸变化，需要调整translate
+            // 简单方法：直接重置平移，然后应用缩放，再重新计算居中
+            // 更精确：保持鼠标位置对应的图片点不变
+            // 获取当前图片显示尺寸
+            const img = lightboxImg;
+            const naturalW = img.naturalWidth;
+            const naturalH = img.naturalHeight;
 
-        /* --- 4. ABOUT 页面逻辑 --- */
-        const aboutLink = document.getElementById('about-link');
-        const aboutOverlay = document.getElementById('about-overlay');
-        const aboutBack = document.getElementById('about-back');
+            // 当前显示尺寸 (考虑缩放)
+            const currentW = naturalW * scale;
+            const currentH = naturalH * scale;
 
-        let savedScrollPosition = 0;
+            // 计算鼠标在图片坐标系中的位置 (相对于图片左上角)
+            const imgRect = img.getBoundingClientRect();
+            const imgLeft = imgRect.left;
+            const imgTop = imgRect.top;
 
-        function openAbout(e) {
-            if (e) e.preventDefault();
+            // 鼠标在图片上的比例位置
+            const px = (e.clientX - imgLeft) / imgRect.width;
+            const py = (e.clientY - imgTop) / imgRect.height;
 
-            savedScrollPosition = window.scrollY;
+            // 新图片尺寸
+            const newW = naturalW * scale;
+            const newH = naturalH * scale;
 
-            aboutOverlay.classList.add('active');
-            aboutOverlay.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('about-open');
-        }
+            // 容器尺寸
+            const containerRect = lightboxWrapper.getBoundingClientRect();
+            const containerW = containerRect.width;
+            const containerH = containerRect.height;
 
-        function closeAbout() {
-            aboutOverlay.classList.remove('active');
-            aboutOverlay.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('about-open');
+            // 计算新的translate，使得鼠标位置对应的图片点不变
+            // 目标：鼠标位置在图片中的比例 (px, py) 保持不变
+            // 图片左上角位置 = 鼠标位置 - 比例 * 图片尺寸
+            // 图片左上角在容器中的位置 = 鼠标在容器中的位置 - 比例 * 图片尺寸
+            const mouseInContainerX = e.clientX - containerRect.left;
+            const mouseInContainerY = e.clientY - containerRect.top;
 
-            window.scrollTo(0, savedScrollPosition);
-        }
-
-        aboutLink.addEventListener('click', openAbout);
-        aboutBack.addEventListener('click', closeAbout);
-
-        document.addEventListener('keydown', (e) => {
-            if (aboutOverlay.classList.contains('active') && e.key === 'Escape') {
-                closeAbout();
-            }
-        });
-    </script>
-
-</body>
-</html>
+            const newTranslateX = (mouseInContainerX - px * newW);
+            const newTranslateY = (
