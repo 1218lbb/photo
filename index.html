@@ -7,24 +7,27 @@
     <style>
         /* --- 1. 全局纯黑沉浸式风格 --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #000; color: #e0e0e0; line-height: 1.6;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #000; color: #e0e0e0; line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
         a:hover { opacity: 0.7; }
 
-        /* --- 2. 顶部信息栏 (固定悬浮，不随页面滚动) --- */
+        /* --- 2. 顶部信息栏 (带滚动渐变效果) --- */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 25px 50px;
-            background-color: transparent;
+            background-color: transparent; /* 初始状态为透明 */
             position: fixed;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
+            transition: background 0.4s ease; /* 添加背景过渡动画 */
+        }
+        /* 滚动后添加的渐变背景样式 */
+        nav.scrolled {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.7));
         }
         .logo { font-size: 20px; font-weight: 600; letter-spacing: 4px; color: #fff; text-transform: uppercase; }
         .nav-links a { margin-left: 40px; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #fff; transition: opacity 0.3s ease; }
@@ -41,42 +44,64 @@
         .slide-caption h3 { font-size: 28px; font-weight: 300; letter-spacing: 3px; margin-bottom: 8px; }
         .slide-caption p { font-size: 14px; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* --- 4. 作品网格（Grid 瀑布流，宽幅图自动跨两格） --- */
+        /* --- 4. 作品网格与放大功能 --- */
         .gallery-section { padding: 100px 50px; max-width: 1600px; margin: 0 auto; }
         .section-title { font-size: 14px; margin-bottom: 50px; text-align: center; letter-spacing: 4px; color: #666; text-transform: uppercase; }
 
+        /* 核心修改：改回瀑布流布局 */
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            grid-auto-rows: 8px;        /* 行高基准，JS 用它累加出每张图的真实高度 */
-            gap: 15px;                  /* 列间距；行间距靠 JS 计算 span 时一并计入 */
-            max-width: 1600px;
-            margin: 0 auto;
+            columns: 3;
+            column-gap: 15px;
         }
+
         .gallery-item {
             position: relative;
             overflow: hidden;
             cursor: pointer;
             background-color: #111;
-            grid-row-end: span 30;      /* 默认占位，加载后由 JS 精确重算 */
+            margin-bottom: 15px;
+            break-inside: avoid;
         }
-        /* 核心：宽幅图(比例>2:1)横跨两列，视觉上更大 */
-        .gallery-item.wide { grid-column: span 2; }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover;          /* 填满由JS算出的、与图片原始比例一致的高度 */
-            display: block;
+            object-fit: cover;
             transition: transform 0.6s ease, filter 0.6s ease;
             filter: brightness(0.9);
         }
-        .gallery-item:hover img { transform: scale(1.08); filter: brightness(1.1); }
 
-        .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 25px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); transform: translateY(100%); transition: transform 0.4s ease; }
-        .gallery-item:hover .overlay { transform: translateY(0); }
-        .overlay h3 { font-size: 18px; color: #fff; margin-bottom: 5px; font-weight: 400; letter-spacing: 1px; }
-        .overlay p { font-size: 12px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .gallery-item:hover img {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 25px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+        .gallery-item:hover .overlay {
+            transform: translateY(0);
+        }
+        .overlay h3 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        .overlay p {
+            font-size: 12px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
         /* --- 5. 图片放大预览 (Lightbox) --- */
         .lightbox { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.98); justify-content: center; align-items: center; cursor: zoom-out; }
@@ -95,8 +120,7 @@
             .hero-slideshow { height: 60vh; }
             .slide-caption h3 { font-size: 20px; }
             .gallery-section { padding: 60px 20px; }
-            .gallery-grid { grid-template-columns: 1fr; gap: 10px; }
-            .gallery-item.wide { grid-column: span 1; } /* 手机端单列，宽图也只占满一行 */
+            .gallery-grid { columns: 1; } /* 手机端改为单列 */
         }
     </style>
 </head>
@@ -111,31 +135,43 @@
 
     <!-- 全屏幻灯片展览 -->
     <div class="hero-slideshow">
+        <!-- 幻灯片 1 -->
         <div class="slide active">
             <img src="1Wilderness.jpg" alt="作品1">
-            <div class="slide-caption"><h3>Wilderness</h3><p>内蒙 · 2022</p></div>
+            <div class="slide-caption">
+                <h3>Wilderness</h3>
+                <p>内蒙 · 2022</p>
+            </div>
         </div>
+        <!-- 幻灯片 2 -->
         <div class="slide">
             <img src="2AThousandTowers.jpg" alt="作品2">
-            <div class="slide-caption"><h3>千塔之城</h3><p>新疆 · 2026</p></div>
+            <div class="slide-caption">
+                <h3>千塔之城</h3>
+                <p>新疆 · 2026</p>
+            </div>
         </div>
+        <!-- 幻灯片 3 -->
         <div class="slide">
             <img src="3AWorldofWhite.jpg" alt="作品3">
-            <div class="slide-caption"><h3>A World of White</h3><p>新疆 · 2026</p></div>
+            <div class="slide-caption">
+                <h3>A World of White</h3>
+                <p>新疆 · 2026</p>
+            </div>
         </div>
     </div>
 
     <!-- 作品网格 -->
     <section class="gallery-section">
         <h2 class="section-title">Selected Works</h2>
-        <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-grid">
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="TheAncientWasteland.jpg" alt="古老遗迹">
                 <div class="overlay"><h3>古老遗迹</h3><p>新疆 · 2026</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="Wilderness.jpg" alt="Wilderness">
-                <div class="overlay"><h3>Wilderness</h3><p>内蒙 · 2022</p></div>
+                <div class="overlay"><h3>Wilderness</h3><p>内蒙 · 2020</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="Waves.jpg" alt="Waves">
@@ -144,10 +180,6 @@
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="AnywhereDoor.jpg" alt="任意门">
                 <div class="overlay"><h3>任意门</h3><p>内蒙 · 2022</p></div>
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="Ethereal.jpg" alt="Ethereal">
-                <div class="overlay"><h3>Ethereal</h3><p>河北 · 2022</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="Paradise.jpg" alt="Paradise">
@@ -160,10 +192,6 @@
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="MarchofFlames.jpg" alt="烈焰进行曲">
                 <div class="overlay"><h3>烈焰进行曲</h3><p>内蒙 · 2022</p></div>
-            </div>
-            <div class="gallery-item" onclick="openLightbox(this)">
-                <img src="FallingDew.jpg" alt="垂露">
-                <div class="overlay"><h3>垂露</h3><p>贵阳 · 2026</p></div>
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="ABladeAboveFrost.jpg" alt="寒天之刃">
@@ -239,7 +267,7 @@
             </div>
             <div class="gallery-item" onclick="openLightbox(this)">
                 <img src="BathofLight.jpg" alt="Bath of Light">
-                <div class="overlay"><h3>Bath of Light</h3><p>内蒙 · 2022</p></div>
+                <div class="overlay"><h3>Bath of Light</h3><p>内蒙 · 2020</p></div>
             </div>
         </div>
     </section>
@@ -264,42 +292,18 @@
         }
         setInterval(nextSlide, INTERVAL_TIME);
 
-        // --- 2. 宽幅检测 + 瀑布流高度计算 ---
-        const ROW = 8;     // 与 CSS grid-auto-rows 一致
-        const GAP = 15;    // 与 CSS gap 一致
-        const grid = document.getElementById('galleryGrid');
-
-        // 根据图片原始比例判断是否宽幅，并精确设置每个卡片跨的行数
-        function layoutItem(item) {
-            const img = item.querySelector('img');
-            if (!img || !img.naturalWidth) return;
-            const ratio = img.naturalWidth / img.naturalHeight;
-            // 宽高比大于 2:1 -> 跨两列
-            item.classList.toggle('wide', ratio > 2);
-            // 读取卡片在跨列生效后的实际宽度，算出图片应渲染的高度
-            const w = item.clientWidth;
-            const imgH = w / ratio;               // 保持原始比例的渲染高度
-            const span = Math.ceil((imgH + GAP) / (ROW + GAP));
-            item.style.gridRowEnd = 'span ' + span;
-        }
-
-        function layoutAll() {
-            document.querySelectorAll('.gallery-item').forEach(layoutItem);
-        }
-
-        // 每张图加载完成后立即重算（图片尺寸此时才可知）
-        document.querySelectorAll('.gallery-item img').forEach(img => {
-            if (img.complete) {
-                layoutItem(img.parentElement);
+        // --- 2. 导航栏滚动渐变逻辑 ---
+        const nav = document.querySelector('nav');
+        const heroSection = document.querySelector('.hero-slideshow');
+        
+        window.addEventListener('scroll', () => {
+            // 当页面滚动距离超过幻灯片高度时，添加 'scrolled' 类
+            if (window.scrollY > heroSection.offsetHeight - 100) {
+                nav.classList.add('scrolled');
             } else {
-                img.addEventListener('load', () => layoutItem(img.parentElement));
+                nav.classList.remove('scrolled');
             }
         });
-        // 初次排版 + 窗口缩放时重排
-        layoutAll();
-        window.addEventListener('load', layoutAll);
-        let _rt;
-        window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(layoutAll, 150); });
 
         // --- 3. 图片放大逻辑 ---
         const lightbox = document.getElementById('lightbox');
@@ -314,7 +318,9 @@
             lightbox.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
     </script>
 </body>
 </html>
