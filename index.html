@@ -226,28 +226,27 @@
         /* ============================================================
            4. 窄屏首页幻灯片
            
-           关键修改：
-           图片高度不再强制为 100%，
-           而是按照图片自身比例显示。
-           
-           整个 slide 允许根据图片高度排列。
-           配文直接放在图片容器底部，
-           因此不会掉到图片外面。
+           只修复窄屏轮播时页面上下跳跃的问题：
+           hero 高度固定为所有轮播图片中最高的一张，
+           每一张图片仍然按照自身比例显示。
            ============================================================ */
 
         @media (max-aspect-ratio: 1.4/1) {
 
             .hero-slideshow {
-                height: auto;
+                height: var(--hero-fixed-height, auto);
                 min-height: 0;
             }
 
             .slide {
-                position: relative;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
                 inset: auto;
 
                 width: 100%;
-                height: auto;
+                height: var(--slide-height, 0px);
 
                 min-height: 0;
 
@@ -267,7 +266,11 @@
             }
 
             .slide img {
-                position: relative;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: auto;
+                bottom: auto;
                 inset: auto;
 
                 display: block;
@@ -303,11 +306,8 @@
             }
 
             /*
-             * 关键：
-             * caption 不再依靠一个固定 bottom 值。
-             *
-             * 它以图片底部为参照，
-             * 始终位于图片内部。
+             * caption 不再依靠固定 top 值。
+             * 它始终以当前图片的底部为参照。
              */
 
             .slide-caption {
@@ -900,13 +900,11 @@
             }
 
             /*
-             * 手机端首页不再固定60vh。
-             *
-             * 让高度完全由当前图片自身比例决定。
+             * 窄屏轮播高度由上面的固定高度机制控制。
              */
 
             .hero-slideshow {
-                height: auto;
+                height: var(--hero-fixed-height, auto);
                 min-height: 0;
             }
 
@@ -1555,6 +1553,183 @@
     setInterval(
         nextSlide,
         INTERVAL_TIME
+    );
+
+
+    /* ============================================================
+       窄屏轮播高度固定
+       
+       只用于解决：
+       不同图片比例导致 hero 高度变化，
+       从而使下面页面上下跳跃的问题。
+       
+       每张图片仍然按照自己的原始比例显示。
+       ============================================================ */
+
+    function fixNarrowHeroHeight() {
+
+        const hero =
+            document.querySelector(
+                '.hero-slideshow'
+            );
+
+        const heroSlides =
+            Array.from(
+                document.querySelectorAll(
+                    '.hero-slideshow .slide'
+                )
+            );
+
+        const heroImages =
+            heroSlides.map(
+                slide =>
+                    slide.querySelector('img')
+            );
+
+
+        if (
+            !hero ||
+            !heroSlides.length ||
+            !heroImages.length
+        ) {
+
+            return;
+        }
+
+
+        if (
+            !window.matchMedia(
+                '(max-aspect-ratio: 1.4/1)'
+            ).matches
+        ) {
+
+            hero.style.removeProperty(
+                '--hero-fixed-height'
+            );
+
+
+            heroSlides.forEach(
+                slide => {
+
+                    slide.style.removeProperty(
+                        '--slide-height'
+                    );
+
+                }
+            );
+
+            return;
+        }
+
+
+        const viewportWidth =
+            hero.clientWidth;
+
+
+        if (
+            viewportWidth <= 0
+        ) {
+
+            return;
+        }
+
+
+        let maxHeight = 0;
+
+
+        heroImages.forEach(
+            (img, index) => {
+
+                if (
+                    img.naturalWidth &&
+                    img.naturalHeight
+                ) {
+
+                    const imageHeight =
+                        viewportWidth *
+                        (
+                            img.naturalHeight /
+                            img.naturalWidth
+                        );
+
+
+                    heroSlides[index]
+                        .style
+                        .setProperty(
+                            '--slide-height',
+                            `${imageHeight}px`
+                        );
+
+
+                    maxHeight =
+                        Math.max(
+                            maxHeight,
+                            imageHeight
+                        );
+
+                }
+
+            }
+        );
+
+
+        if (
+            maxHeight > 0
+        ) {
+
+            hero.style.setProperty(
+                '--hero-fixed-height',
+                `${maxHeight}px`
+            );
+        }
+    }
+
+
+    /*
+     * 图片加载完成后计算。
+     */
+
+    document
+        .querySelectorAll(
+            '.hero-slideshow img'
+        )
+        .forEach(
+            img => {
+
+                if (
+                    img.complete
+                ) {
+
+                    fixNarrowHeroHeight();
+
+                } else {
+
+                    img.addEventListener(
+                        'load',
+                        fixNarrowHeroHeight
+                    );
+
+                }
+
+            }
+        );
+
+
+    /*
+     * 初始计算。
+     */
+
+    fixNarrowHeroHeight();
+
+
+    /*
+     * 窗口尺寸变化时重新计算，
+     * 防止横竖屏切换或调整浏览器宽度后高度不正确。
+     */
+
+    window.addEventListener(
+        'resize',
+        fixNarrowHeroHeight
     );
 
 
@@ -3796,6 +3971,7 @@
 
                 closeAbout();
             }
+
         }
     );
 
