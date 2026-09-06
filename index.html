@@ -113,12 +113,6 @@
 
         /* ============================================================
            3. 首页幻灯片
-           
-           宽画面：
-           整个滚动区域直接充满浏览器高度。
-           
-           图片使用 contain，
-           保证完整显示，不再因为 cover 而被上下裁剪。
            ============================================================ */
 
         .hero-slideshow {
@@ -148,12 +142,59 @@
             background: #000;
 
             pointer-events: none;
+
+            overflow: hidden;
         }
 
         .slide.active {
             opacity: 1;
             pointer-events: auto;
         }
+
+
+        /* ============================================================
+           宽屏图片背景
+           
+           使用当前照片本身作为背景：
+           - 大幅放大
+           - 强烈模糊
+           - 覆盖整个屏幕
+           
+           当原照片无法覆盖整个屏幕时，
+           背景不会出现黑色空洞。
+           ============================================================ */
+
+        .slide::before {
+            content: '';
+
+            position: absolute;
+
+            inset: -12%;
+
+            z-index: 0;
+
+            background-image:
+                var(--slide-background);
+
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+
+            filter:
+                blur(35px);
+
+            transform:
+                scale(1.15);
+
+            opacity: 0.72;
+
+            pointer-events: none;
+        }
+
+
+        /* ============================================================
+           主图片
+           ============================================================ */
 
         .slide img {
             position: absolute;
@@ -166,7 +207,17 @@
             object-position: center center;
 
             display: block;
+
+            z-index: 1;
         }
+
+
+        /* ============================================================
+           底部渐隐
+           
+           最底部直接变成 #000，
+           确保绝对没有亮线。
+           ============================================================ */
 
         .slide::after {
             content: '';
@@ -177,18 +228,29 @@
             left: 0;
             right: 0;
 
-            height: 40%;
+            height: 43%;
 
-            background: linear-gradient(
-                to top,
-                rgba(0,0,0,0.85) 0%,
-                rgba(0,0,0,0.45) 35%,
-                transparent 100%
-            );
+            z-index: 2;
 
-            z-index: 1;
+            background:
+                linear-gradient(
+                    to top,
+                    #000 0%,
+                    #000 7%,
+                    rgba(0,0,0,0.97) 14%,
+                    rgba(0,0,0,0.82) 28%,
+                    rgba(0,0,0,0.58) 48%,
+                    rgba(0,0,0,0.25) 72%,
+                    rgba(0,0,0,0) 100%
+                );
+
             pointer-events: none;
         }
+
+
+        /* ============================================================
+           配文
+           ============================================================ */
 
         .slide-caption {
             position: absolute;
@@ -197,7 +259,7 @@
             left: 0;
             right: 0;
 
-            z-index: 2;
+            z-index: 3;
 
             padding: 0 40px;
 
@@ -235,15 +297,6 @@
 
         /* ============================================================
            4. 窄屏首页幻灯片
-           
-           图片保持自身比例，不裁剪。
-           
-           所有 slide 始终存在于画面中，
-           只通过 opacity 做淡入淡出，
-           因此窄画面也可以正常播放动画。
-           
-           hero 高度由 JS 固定为所有图片中最高的高度，
-           防止 Selected Works 上下跳动。
            ============================================================ */
 
         @media (max-aspect-ratio: 1.4/1) {
@@ -280,6 +333,8 @@
                         0.2,
                         1
                     );
+
+                overflow: hidden;
             }
 
             .slide.active {
@@ -287,6 +342,17 @@
                 opacity: 1;
                 pointer-events: auto;
             }
+
+
+            /*
+             * 窄屏不使用模糊背景。
+             * 图片本身完整显示。
+             */
+
+            .slide::before {
+                display: none;
+            }
+
 
             .slide img {
                 position: absolute;
@@ -306,14 +372,16 @@
 
                 object-fit: contain;
                 object-position: top center;
+
+                z-index: 1;
             }
 
+
             /*
-             * 渐隐层直接覆盖整个图片的底部区域。
+             * 窄屏底部渐隐。
              *
-             * 因为 slide 的高度已经由 JS
-             * 设置成当前图片的真实显示高度，
-             * 所以渐隐不会跑到图片外面。
+             * 最底部同样强制为纯黑，
+             * 避免图片边缘出现亮线。
              */
 
             .slide::after {
@@ -324,24 +392,28 @@
                 left: 0;
                 right: 0;
 
-                height: 42%;
+                height: 44%;
 
-                background: linear-gradient(
-                    to top,
-                    rgba(0,0,0,0.90) 0%,
-                    rgba(0,0,0,0.68) 20%,
-                    rgba(0,0,0,0.38) 48%,
-                    rgba(0,0,0,0.08) 78%,
-                    transparent 100%
-                );
+                background:
+                    linear-gradient(
+                        to top,
+                        #000 0%,
+                        #000 7%,
+                        rgba(0,0,0,0.97) 15%,
+                        rgba(0,0,0,0.82) 30%,
+                        rgba(0,0,0,0.55) 50%,
+                        rgba(0,0,0,0.20) 74%,
+                        rgba(0,0,0,0) 100%
+                    );
 
-                z-index: 1;
+                z-index: 2;
 
                 pointer-events: none;
             }
 
+
             /*
-             * caption 始终贴在图片底部。
+             * caption 始终位于图片内部下部。
              */
 
             .slide-caption {
@@ -353,7 +425,7 @@
                 left: 0;
                 right: 0;
 
-                z-index: 2;
+                z-index: 3;
 
                 padding:
                     70px 25px
@@ -932,11 +1004,6 @@
                 margin-left: 20px;
                 font-size: 11px;
             }
-
-            /*
-             * 窄屏下保持 JS 计算出来的固定高度，
-             * 避免幻灯片切换时页面上下跳动。
-             */
 
             .hero-slideshow {
                 height: var(--hero-fixed-height, auto);
@@ -1592,13 +1659,52 @@
 
 
     /* ============================================================
+       首页图片背景
+       
+       将每一张图片自身设置为对应 slide 的模糊背景。
+       ============================================================ */
+
+    document
+        .querySelectorAll(
+            '.hero-slideshow .slide'
+        )
+        .forEach(
+            (slide) => {
+
+                const img =
+                    slide.querySelector(
+                        'img'
+                    );
+
+                if (!img) {
+                    return;
+                }
+
+                const imageSource =
+                    img.currentSrc ||
+                    img.src;
+
+                if (
+                    imageSource
+                ) {
+
+                    slide.style.setProperty(
+                        '--slide-background',
+                        `url("${imageSource}")`
+                    );
+                }
+
+            }
+        );
+
+
+    /* ============================================================
        窄屏幻灯片高度
        
        计算所有首页图片的实际显示高度，
        取最高值作为整个 hero 的固定高度。
        
-       每一张 slide 自己仍然保持对应图片的真实高度，
-       因此渐隐和 caption 都严格位于图片内部。
+       每一张 slide 自己保持对应图片的真实高度。
        ============================================================ */
 
     function fixNarrowHeroHeight() {
@@ -1749,7 +1855,30 @@
 
                 img.addEventListener(
                     'load',
-                    fixNarrowHeroHeight
+                    () => {
+
+                        const slide =
+                            img.closest(
+                                '.slide'
+                            );
+
+                        if (
+                            slide
+                        ) {
+
+                            const imageSource =
+                                img.currentSrc ||
+                                img.src;
+
+                            slide.style.setProperty(
+                                '--slide-background',
+                                `url("${imageSource}")`
+                            );
+                        }
+
+
+                        fixNarrowHeroHeight();
+                    }
                 );
 
             }
@@ -3268,8 +3397,6 @@
              * 默认状态：
              *
              * 这里只记录手指移动。
-             *
-             * touchend 时才切图。
              */
 
             touchLastX =
@@ -3414,32 +3541,14 @@
                         deltaX < 0
                     ) {
 
-                        /*
-                         * 向左滑：
-                         * 下一张
-                         *
-                         * 图片从右侧滑入
-                         */
-
                         nextImage(true);
 
                     } else {
-
-                        /*
-                         * 向右滑：
-                         * 上一张
-                         *
-                         * 图片从左侧滑入
-                         */
 
                         previousImage(true);
                     }
                 }
 
-
-                /*
-                 * 阻止后续 click。
-                 */
 
                 hasDragged = true;
 
